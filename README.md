@@ -87,10 +87,28 @@ After files exist, it runs a **polish pass**:
 | What | How |
 |------|-----|
 | Firecrawl key (harvest) | Copy `.env.example` → `.env`, add key from [firecrawl.dev](https://firecrawl.dev) (free tier available) |
+| Image API (Pexels/Unsplash) | Copy `.env.example` → `.env`, add `PEXELS_API_KEY` ([pexels.com/api](https://www.pexels.com/api/), free) or `UNSPLASH_ACCESS_KEY` — sources niche-tailored photos at generation time |
 | Canva MCP | One-time browser login — generates designed image assets |
 | 21st.dev Magic MCP | Component generator — free key at [21st.dev/magic/console](https://21st.dev/magic/console), configured in Claude Code MCP settings |
 
-Images default to [Neurascapes](https://neurascapes.com) (free royalty-free AI photos, no setup).
+Images default to [Neurascapes](https://neurascapes.com) (free royalty-free AI photos, no setup); add a Pexels/Unsplash key above for sharper, niche-tailored stock photos.
+
+---
+
+## Niche design intelligence
+
+Before picking a tier, the skill **studies how the niche LOOKS** — leading brand sites, industry-filtered galleries (Land-book, SiteInspire, Awwwards, Mobbin), and real competitors — using built-in web tools (`WebSearch`/`WebFetch`, the `firecrawl-*` skills, `research`/`deep-research`). **No API key required.** It researches *visual/design conventions only*; real copy comes later from the client, so the site ships niche-appropriate placeholder copy marked `[PLACEHOLDER — client to replace]`. The output is a `NICHE-BRIEF.md` in the generated project root that drives tier, token-lock, prompt sampling, imagery, and motion.
+
+## Image API (optional — sharper, niche-tailored photos)
+
+Step 5 can pull real stock photos tailored to the niche brief. Provide **one** key (generation-time only):
+
+| Provider | Key | Notes |
+|----------|-----|-------|
+| Pexels (default) | `PEXELS_API_KEY` | Free, no attribution required — [pexels.com/api](https://www.pexels.com/api/) |
+| Unsplash (alt) | `UNSPLASH_ACCESS_KEY` | Requires attribution + download-trigger — [unsplash.com/developers](https://unsplash.com/developers) |
+
+Copy `.env.example` → `.env` and paste your key (or export it in your shell). **The key is read only while the skill runs; images are downloaded into the generated project's `public/`, and the key is never written into the generated site or committed.** `.env` is gitignored — never commit a real key (this repo is public). If no key is set, images fall back to Neurascapes → Canva → placeholder.
 
 ---
 
@@ -135,7 +153,7 @@ website-generator/
 ├── SKILL.md                      # Main skill — workflow, tier logic, all steps
 ├── README.md                     # This file
 ├── skills-lock.json              # Companion skills manifest (16 skills, pinned)
-├── .env.example                  # FIRECRAWL_API_KEY template
+├── .env.example                  # FIRECRAWL_API_KEY + image-API key templates
 ├── prompts/                      # Prompt library (10 UI categories × 5 tiers)
 │   ├── _index.md
 │   ├── hero-sections.md

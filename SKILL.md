@@ -13,9 +13,51 @@ Trigger on any request to build, generate, or scaffold a website, web app, landi
 
 ## Workflow overview
 
-Intake (2 questions) → pick a design tier → sample prompts from the library → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding a deterministic design direction when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon), see "Motion & interactive components")** → source image assets → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → report what was used.
+Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → sample prompts from the library **(brief biases the categories)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(keyed image API queried from the brief's style descriptor, downloaded into `public/`)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → report what was used.
 
 Follow the steps below in order. **Do not write any files until Step 4.** The **Quality Trio** call (see "Design quality" section below) happens between Step 3 and Step 4 and is required, not optional. The **polish pass** (Step 6) runs after Step 5 and is also required — the scaffold is not "done" until critique returns clean.
+
+---
+
+## Multi-site requests — total differentiation mandate (3+ designs)
+
+**Trigger:** the user asks for **three or more** websites, designs, variations, options, versions, concepts, or mockups in a single request ("make me 3 sites", "give me 5 designs", "a few different versions", "some options for my restaurant").
+
+When triggered you are **not** generating one site with variants — you run the **full pipeline (Steps 1–6) independently, once per site**, under one hard rule:
+
+> **Every site in the set must be completely different from every other site in the set — on every axis below. Nothing is shared, reused, or reskinned across siblings.**
+
+Differentiate each site on **all** of these, never a subset:
+
+| Axis | What must differ across siblings |
+|------|----------------------------------|
+| **Design intensity** | Independently roll a **random tier 1–5 per site** — do **not** reuse the niche-default tier. Don't repeat an intensity until all five are used. Different intensity cascades into a different stack, motion level, and registry. |
+| **Structure (HTML / JSX / DOM)** | Different section count and order, different page architecture, different component composition. Not the same skeleton reordered. |
+| **CSS / design system** | Different palette, font pairing, spacing scale, and **style family** (e.g. minimal vs brutalist vs glassmorphism vs editorial). No palette or pairing repeats across the set. |
+| **Every UI component** | No component pattern reused across siblings — a hero in site 1 may not reappear in site 2. Re-sample with **zero prompt overlap** between siblings (track what each site used; resample on collision). |
+| **Layout / positioning** | Move things around: nav top vs side vs centered vs split; hero centered vs left vs asymmetric split; different grids and content order. |
+| **Images** | Different source images and art direction per site — different **image-API queries** / Neurascapes collections / Canva compositions. **Vary the count:** some sites single-image, some multi-image (galleries, multiple photos per section). No image file shared across siblings. |
+| **Copy / words** | Different headlines, body, CTAs, and tone per site. Not the same text reskinned. |
+
+**Niche brief in multi-site mode:** when the batch shares one niche, derive the Niche Design Brief (Step 1.5) once, then give **each sibling a different design interpretation of it** — different reference exemplars, palette/accent, type character, motion character, and image-API queries. The brief informs imagery, motion, and reference vocabulary only; it does **not** lock the batch to one look — each sibling still **rolls its own random tier (1–5) and binds a different, unused design direction** per the rules above (those override the brief's single Tier and Design-direction fields).
+
+**Mechanism:** loop the pipeline per site. For each site, independently (1) roll tier 1–5, (2) pick an **unused** design direction / palette / font / style, (3) sample a **non-overlapping** prompt set, (4) source a fresh image set with its own image count, (5) write fresh copy, (6) scaffold into its **own** project folder (`generated-site-<slug>-<n>/`), (7) run the Step 6 polish pass — then build the next site from scratch.
+
+### Red flags — you are violating the mandate if you think:
+
+- "I'll build one scaffold and swap the palette for the others" → that's one site reskinned, not three.
+- "Same layout, different colors is different enough" → layout and positions must differ too.
+- "I'll reuse the hero / nav / footer across all of them" → no component is reused across siblings.
+- "They're all the same niche so they can share photos" → different images per site, and vary the count.
+- "The same headline works for all three" → copy differs per site.
+- "Sampling the same prompts again is fine" → zero prompt overlap across siblings.
+- "I'll just give them all tier 3" → intensity is randomized 1–5 per site.
+
+**All of these mean: stop, and generate the next site as if it were the only thing you were asked to build — from a blank folder.**
+
+### Before delivering, verify every pair of sites differs on:
+
+structure · palette / fonts / style · every component · layout positions · images (and image count) · copy · tier. If any two siblings match on a whole axis, regenerate the later one.
 
 ---
 
@@ -27,6 +69,83 @@ Ask the user exactly two questions and wait for both answers:
 2. **What's it about / who's it for?** (one or two sentences of context.)
 
 If either answer is ambiguous, ask one focused follow-up. Reach ~95% confidence about the niche and audience before continuing — guessing here wastes a whole generation.
+
+## Step 1.5 — Niche design intelligence
+
+Before picking a tier, **study how the best sites in this niche LOOK** and distill a **Niche Design Brief** that biases every downstream choice. This researches **visual/design conventions only — not content.** The client supplies real copy and facts later, so the generated site ships **niche-appropriate placeholder copy clearly marked for client replacement** (label it `[PLACEHOLDER — client to replace]`); do **not** research or invent factual claims, names, prices, or testimonials.
+
+**No API key. Research runs on your built-in tools** — `WebSearch` + `WebFetch`/`defuddle`, the `firecrawl-*` skills (`firecrawl-search` / `firecrawl-scrape` / `firecrawl-map`), and the `research` / `deep-research` skills. You are already Claude with web access; nothing here needs a Claude or research API key. **Time-box it:** 4–6 reference sites, ~10 minutes, then lock the brief and move on. Capture **screenshots, not just markdown** — this is a *visual* study, so the rendered look is the signal.
+
+**Research method (in order):**
+
+1. **Category-leading brand sites (2–3 best-in-class).** Search `"best [niche] website design [year]"` / `"[niche] award winning website"`. Extract hero archetype, palette temperature, type personality, signature motion, photographic style. Shared traits = the genre convention; outliers = differentiation room.
+2. **Inspiration galleries, filtered by industry.** Land-book (industry filters), SiteInspire (category + style), Awwwards / Godly / FWA (Tier 4–5 craft ceiling), One Page Love / Lapa Ninja (section rhythm + CTA patterns), Mobbin (SaaS/app/fintech UI). Tally frequencies across 8+ examples — **the mode is the niche convention.**
+3. **Dribbble / Behance — art-direction layer.** Read as *direction*, not literal layout: color moods, illustration-vs-photography lean, texture/shape vocabulary.
+4. **2–3 real competitor sites.** The lived convention — nav style, CTA placement, trust signals, photo subjects — so the site reads native, not alien.
+
+**Synthesis rule:** Convention = the **mode** across galleries + competitors (so it reads *native*). Differentiation = one or two deliberate moves beyond the mode, borrowed from the award tier (so it reads *designed*, not templated slop). Capture both.
+
+**Design-dimension checklist — capture each, route it to a real lever:**
+
+| Dimension | Capture | Routes to |
+|-----------|---------|-----------|
+| **Color / palette** | temperature, saturation, contrast, accent behavior, light/dark default | design-direction token-lock + `--accent` override (Step 3.5) |
+| **Typography** | serif/sans/mono display, weight contrast, type-as-hero? | the direction's font stacks (Step 3.5); type-forward → bias `animations` |
+| **Imagery art-direction** | subject · lighting · mood · composition · photo/illustration/3D | the Step 5 style descriptor + image query seeds |
+| **Layout & density** | grid type, density, section sequence | tier confirmation + which prompt categories to sample |
+| **Motion & scroll** | still / light reveals / scroll storytelling / heavy | Framer patterns by tier + registry choice |
+| **Shape / texture** | radius language, texture, border, icon style | direction posture + `backgrounds`/`interactive-elements` bias |
+| **Native components** | hero · nav · card · section rhythm | prompt-category sampling bias + scaffold component order |
+
+**The Niche Design Brief (artifact).** Emit it at the end of this step and **save it to the project root as `NICHE-BRIEF.md`** (write it before Step 4 creates the folder, then move it in; or create the folder now and write it there). Echo the key lines into the generated `README.md`. Fields:
+
+- **Niche & read** — what genre signal it must read as, to whom
+- **Tier** — 1–5 + name (confirms/adjusts the `tier-niche-map` default)
+- **Design direction (token-lock)** — `modern-minimal` | `tech-utility` | `human-approachable` | `editorial-monocle` | `brutalist-experimental` (or brand/URL source if supplied)
+- **Palette mood** — temperature, saturation, contrast, light/dark + **accent override** (`--accent` value or "keep direction default")
+- **Type character** — serif/sans/mono display · weight contrast · type-as-hero? · letter-spacing
+- **Imagery direction** — the Step 5 style descriptor: subject · lighting · mood · composition · photo/illustration/3D
+- **Image query seeds** — 3+ search strings for the Step 5 keyed image API
+- **Layout & density** — grid type · density · section sequence
+- **Motion character** — still / light reveals / scroll storytelling / heavy + Framer patterns + registry (or none)
+- **Shape / texture** — radius language · texture · border · icon style
+- **Native components** — hero · nav · card · section order
+- **`ui-ux-pro-max`** — style + UX focus (only when a direction is active)
+- **Prompt categories to sample** — 5–8 of the 10
+- **One deliberate departure** — the single bold move beyond the genre mode
+- **Anti-references** — generic AI-slop traits to steer away from for this niche
+- **Reference brands + galleries used**
+
+**How the brief feeds the rest of the pipeline:**
+
+- **Step 2 (tier):** the brief's density/expressiveness confirms or nudges the `tier-niche-map` default.
+- **Step 3 (sampling):** sample the prompt categories the brief lists, and pick `hero-sections`/`navigation`/`cards-and-grids` prompts whose archetype matches the captured native components.
+- **Step 3.5 (token-lock):** bind the brief's design direction into `:root`, apply its `--accent` override (this extends the existing user-triggered `--accent` lever to a research-derived value — same lever), honor its type character. `ui-ux-pro-max` contributes only style + UX focus when a direction is active (never stack two palettes).
+- **Step 5 (images):** the brief's **imagery direction is the single style descriptor**, and its **image query seeds** are the keyed-API search strings.
+- **Motion:** the brief's motion character selects the Framer pattern set and the one registry flavor (calm trust-niches stay at hover + light reveals — never bolt scroll spectacle on).
+
+**Worked example — Mexican restaurant (marketing/menu site):**
+
+```
+## Niche Design Brief — Mexican restaurant
+- Niche & read: marketing/menu site — warm, appetizing, hospitable to diners
+- Tier: 3 — Modern Consumer (tier-niche-map default, confirmed)
+- Design direction: human-approachable + accent override
+- Palette mood: warm, saturated, high-appetite contrast, light default
+  → --accent ≈ oklch(58% 0.16 40) terracotta (keep direction bg/fg)
+- Type character: friendly sans display, strong weight contrast, readable body — NOT a thin luxury serif
+- Imagery direction: overhead & tight-crop food close-ups, warm golden light, hand-and-plate candor, real photography (not illustration)
+- Image query seeds: ["warm rustic Mexican tacos close-up natural golden light", "colorful salsa molcajete overhead terracotta", "lively taqueria interior warm string lights"]
+- Layout & density: photo-forward; hero/menu/gallery/reserve/footer
+- Motion character: light reveals + stagger (whileInView + staggerChildren on menu cards); registry: none
+- Shape/texture: comfortable radii (12–18px), subtle warm grain, image-led cards, solid-warm icons
+- Native components: hero=full-bleed food photo + reserve CTA · nav=minimal sticky, logo left · card=image-led dish cards
+- ui-ux-pro-max: style=warm photographic minimalism · UX focus=touch targets, image performance, clear booking CTA
+- Prompt categories: hero-sections, navigation, cards-and-grids, scroll-effects, forms-and-inputs, footers
+- One deliberate departure: a single oversized hand-painted dish name as a typographic accent
+- Anti-references: cartoon sombrero/cactus clichés, muddy browns, dark moody lighting that kills appetite
+- Reference brands: Tacombi, Bartaco, Calo · galleries: Land-book "Food & Drinks", SiteInspire "Food", Lapa Ninja
+```
 
 ## Step 2 — Select the design intensity tier
 
@@ -98,21 +217,30 @@ generated-site-<timestamp>/
 └── README.md           # tier, niche, sampled prompts + sources
 ```
 
-Before writing files, confirm there is a `.gitignore` and that `.env` is listed in it. Never hardcode secrets — if the site needs a key, put a blank entry in `.env.example` and reference it via `import.meta.env`.
+Before writing files, confirm there is a `.gitignore` and that `.env` is listed in it. Never hardcode secrets — if the site needs a key, put a blank entry in `.env.example` and reference it via `import.meta.env`. **This runtime-key pattern (`import.meta.env` / `VITE_`) is only for keys the deployed site genuinely needs at runtime — the Step 5 image-API key is *not* one of them: it is generation-time only and must never be exposed via `import.meta.env` or a `VITE_`/`NEXT_PUBLIC_` prefix.**
 
 At the top of `src/App.jsx`, include a comment block logging the chosen tier, the niche, and every sampled prompt (title + source + URL). The generated `README.md` repeats this so the user can trace every design decision.
 
-## Step 5 — Image assets (Neurascapes first, Canva fills the gaps)
+## Step 5 — Image assets (keyed image API first, then Neurascapes → Canva → placeholder)
 
-Sites need images — hero visuals, section photos, atmospheric backgrounds, og:image. Source them from a **mix of two providers**, picking whichever fits each slot:
+Sites need images — hero visuals, section photos, atmospheric backgrounds, og:image. Source them through a fallback chain, top to bottom; the first tier that yields a usable image for a slot wins. **Reuse the single style descriptor from the Niche Design Brief (Step 1.5) for every image** so the whole set reads cohesive.
 
-1. **List the image slots** the site needs, then derive one short **style descriptor** (palette + art direction + mood) from the theme. Reuse it for every image so the whole set looks cohesive.
-2. **Neurascapes first — for photographic / atmospheric imagery.** [Neurascapes](https://www.neurascapes.com/) is a free, royalty-free library of curated AI-generated photos grouped into themed collections; its license allows commercial use with no attribution. It is server-rendered, so a plain `WebFetch` works — it has no API/MCP, so just fetch the site and pick from what's there. For each photographic, lifestyle, or mood slot, find a collection/image matching the niche + style descriptor and **download the match into `public/`** (download, don't hot-link — the site should own its assets).
-3. **Canva fills the gaps — for designed graphics and missing matches.** When Neurascapes has no good match, or the slot needs a *designed* asset (og:image, branded composition, illustration, anything with text or layout), generate it with the **Canva MCP**: `generate-design` / `generate-design-structured` → `export-design` to PNG → save into `public/`. The Canva MCP authenticates via a one-time browser login (free Canva account); the first call prompting for it is expected.
+1. **List the image slots** the site needs and confirm the brief's style descriptor (subject · lighting · mood · composition · photo/illustration/3D) + one palette/temperature anchor. Build each query from the brief's **image query seeds** plus that locked style + mood lexicon — only the subject slot varies per slot. Pass geometry as the API `orientation` param (hero → `landscape`, card/avatar → `square` [Unsplash: `squarish`], sidebar → `portrait`), not in the text. Track chosen image ids in a `Set` to de-dupe.
 
-A normal build ends up with a **mix** — real AI photos from Neurascapes where they fit, Canva-generated assets where they don't. Apply the same style descriptor to both so they sit together cleanly.
+2. **Keyed image API first — the primary niche-tailored source.** When an image-API key is present, search it with the brief's query seeds, then **download the chosen file's bytes into `public/`** (download, don't hot-link). Two providers, auto-selected by which key is set:
+   - **Pexels (recommended default)** — free, generous limits, **no required attribution**. `GET https://api.pexels.com/v1/search?query=…&orientation=…&per_page=15` with header `Authorization: <PEXELS_API_KEY>`; download `src.large2x`.
+   - **Unsplash (alternative)** — `GET https://api.unsplash.com/search/photos?query=…&orientation=…` with header `Authorization: Client-ID <UNSPLASH_ACCESS_KEY>`; download `urls.full`/`urls.regular`. **Unsplash adds two mandatory compliance steps:** (a) the instant an image is selected, fire one authenticated `GET` to the photo's `links.download_location` (tracking only — discard the response body); (b) **render visible attribution** — "Photo by [`user.name`](`user.links.html`) on [Unsplash](https://unsplash.com)" with `?utm_source=website_generator&utm_medium=referral` on both links — written into the generated `README.md`/`CREDITS.md` and a page credit. Pexels needs neither.
+   - **If both keys are set, Pexels is used. If neither is set, skip silently to Neurascapes** — generation never hard-fails for a missing key.
 
-**Fallback:** if neither source supplies an image, leave a clearly-described placeholder — a styled `<div>` plus a comment naming exactly what image belongs there — so the site still runs and the user can drop one in later.
+3. **Neurascapes — for photographic / atmospheric slots the API missed.** [Neurascapes](https://www.neurascapes.com/) is a free, royalty-free library of curated AI photos; commercial use, no attribution. Server-rendered, so a plain `WebFetch` works (no API/MCP). Match a collection to the niche + style descriptor and **download into `public/`.**
+
+4. **Canva — for designed graphics and missing matches.** When the slot needs a *designed* asset (og:image, branded composition, illustration, anything with text/layout), generate it with the **Canva MCP**: `generate-design` / `generate-design-structured` → `export-design` to PNG → save into `public/`. One-time browser login (free account) on first call is expected.
+
+5. **Fallback placeholder (always succeeds).** If nothing supplies an image, leave a styled `<div>` in the brief's palette plus a comment naming exactly what image belongs there — the layout never breaks and the user can drop one in later.
+
+Apply the same style descriptor across every tier above so API photos, Neurascapes, and Canva assets sit together cleanly.
+
+> **Security — generation-time only; NEVER prefix an image key with `VITE_`/`NEXT_PUBLIC_` and never write it into the generated project (that inlines it into the public bundle).** The image-API key is read **only here, at generation time**, from a process env var (`PEXELS_API_KEY` / `UNSPLASH_ACCESS_KEY`), optionally loaded from a **gitignored `.env` in this skill folder** (see the skill's `.env.example`). The key calls `api.pexels.com` / `api.unsplash.com`, the **bytes are downloaded into `public/`**, and the key is dropped there forever — not into the project's `.env`, `vite.config`, a config file, or an `<img>` URL. The only artifact crossing into the shipped site is image bytes. This skill repo is **public** — never commit a real key.
 
 ## Step 6 — Polish pass (required before reporting done)
 
@@ -258,7 +386,7 @@ These are bundled with Taste Skill v2 and live as standalone skills. Pick one wh
 | `gpt-taste` | Tier 4-5, GSAP-heavy scroll storytelling with strict AIDA structure |
 | `stitch-design-taste` | When the user wants a DESIGN.md emitted for Google Stitch as a deliverable |
 
-### Image generation alternatives (Step 5 supplements to Neurascapes / Canva)
+### Image generation alternatives (Step 5 supplements to the image API / Neurascapes / Canva)
 
 | Skill | Use when |
 |-------|----------|
