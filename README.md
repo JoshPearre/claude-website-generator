@@ -90,6 +90,7 @@ After files exist, it runs a **polish pass**:
 | Image API (Pexels/Unsplash) | Copy `.env.example` → `.env`, add `PEXELS_API_KEY` ([pexels.com/api](https://www.pexels.com/api/), free) or `UNSPLASH_ACCESS_KEY` — sources niche-tailored photos at generation time |
 | Canva MCP | One-time browser login — generates designed image assets |
 | 21st.dev Magic MCP | **Live** 21st.dev components (search + generate code + logos + refine) — supersedes the frozen 21st.dev snapshot when configured. Key + setup below. |
+| Higgsfield MCP | AI **image + video** generation (Kling/Seedance/Veo/Sora) — primary Step 5 imagery + Tier 4-5 scroll video. Keyless (account/credit auth). Setup below. |
 
 Images default to [Neurascapes](https://neurascapes.com) (free royalty-free AI photos, no setup); add a Pexels/Unsplash key above for sharper, niche-tailored stock photos.
 
@@ -128,6 +129,22 @@ claude mcp add magic -e API_KEY=$MAGIC_API_KEY -- npx -y @21st-dev/magic@latest
 Or copy [`mcp.json.example`](mcp.json.example) → `.mcp.json` in the directory you generate sites from (it uses `${MAGIC_API_KEY}` expansion, so it's safe to commit — the key stays in your shell). Full setup, tool contract, and fallback rules: [`references/21st-dev-mcp.md`](references/21st-dev-mcp.md).
 
 > **Cost:** the API key is free to create and there's a free tier to try it, but generation is **credit-metered** (a small monthly free allowance, then paid plans from ~$20/mo) — see [21st.dev pricing](https://help.21st.dev/magic-chat/pricing). It's free to get started, not unlimited-free. The skill works fine without it via the snapshot fallback.
+
+---
+
+## Higgsfield MCP (optional — AI image & video)
+
+Connect the [**Higgsfield MCP**](https://higgsfield.ai/mcp) and the skill generates site visuals directly: it becomes the **primary Step 5 imagery source** (ahead of the Pexels/Unsplash → Neurascapes → Canva chain), and on Tier 4-5 it can build a **scroll-driven video** set-piece — generate a start frame and an end frame, then a first-last-frame video model (Kling Omni FLF / Seedance / Image2Video) fills the motion between them, scrubbed by scroll position. When it isn't connected, Step 5 falls back to the normal chain — no hard fail.
+
+**It's keyless.** The official server authenticates through your Higgsfield **account** (browser auth) and bills your Higgsfield **credits** — there's no API key to set or commit.
+
+```sh
+claude mcp add --transport http --scope user higgsfield https://mcp.higgsfield.ai/mcp
+```
+
+Then authenticate in the browser when prompted; `claude mcp list` should show `higgsfield … √ Connected`. Full setup, the tool contract, and the scroll-video pipeline: [`references/higgsfield.md`](references/higgsfield.md).
+
+> **Cost:** images are cheap-ish, but **video is real credits per clip** — the skill gates video on a cost check and treats it as opt-in, Tier 4-5 only. It never spends credits on its own without the work calling for it.
 
 ---
 
@@ -192,7 +209,8 @@ website-generator/
 │   └── design-directions.md      # 5 palette+font+posture anchors
 ├── references/
 │   ├── component-registries.md   # shadcn registry catalogs + install contracts
-│   └── 21st-dev-mcp.md           # 21st.dev Magic MCP setup, tools, fallback contract
+│   ├── 21st-dev-mcp.md           # 21st.dev Magic MCP setup, tools, fallback contract
+│   └── higgsfield.md             # Higgsfield MCP setup, image+video tools, scroll-video
 ├── sources/
 │   └── _sources.md               # Harvest source tracking
 ├── harvest/                      # Workflow for populating the prompt library

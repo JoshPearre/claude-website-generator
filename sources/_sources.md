@@ -34,6 +34,8 @@ If you later want their *patterns* as text prompts too (e.g. to feed the Step 3 
 
 **21st.dev is also wired as a live MCP**, distinct from the shadcn registries above: the **Magic MCP** (`@21st-dev/magic`) is preferred over the harvested 21st.dev snapshot whenever it's configured, and the snapshot remains the offline fallback. It isn't a shadcn registry and isn't harvested — see `references/21st-dev-mcp.md`.
 
+**Higgsfield is an asset-generation MCP**, not a prompt/component source — so it isn't harvested and has no row above. It's a Step 5 *image + video* source (Kling/Seedance/Veo/Sora): primary imagery when connected, plus the Tier 4-5 scroll-video pipeline, falling back to the keyed image API chain when absent. Keyless (account/credit auth) — see `references/higgsfield.md`.
+
 ## Adding a source
 
 Append a row above with `Status: pending`, then run the harvest (see `../harvest/HARVEST_GUIDE.md`). Update the status to `harvested` (or `partial`) once prompts land in `prompts/`.

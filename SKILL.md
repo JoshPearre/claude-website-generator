@@ -13,7 +13,7 @@ Trigger on any request to build, generate, or scaffold a website, web app, landi
 
 ## Workflow overview
 
-Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → sample prompts from the library **(brief biases the categories; live 21st.dev via the Magic MCP when configured — see section below)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(keyed image API queried from the brief's style descriptor, downloaded into `public/`)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → report what was used.
+Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → sample prompts from the library **(brief biases the categories; live 21st.dev via the Magic MCP when configured — see section below)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(Higgsfield-generated when its MCP is connected, else keyed image API — both queried from the brief's style descriptor, downloaded into `public/`; Tier 4-5 may add opt-in Higgsfield scroll video)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → report what was used.
 
 Follow the steps below in order. **Do not write any files until Step 4.** The **Quality Trio** call (see "Design quality" section below) happens between Step 3 and Step 4 and is required, not optional. The **polish pass** (Step 6) runs after Step 5 and is also required — the scaffold is not "done" until critique returns clean.
 
@@ -248,20 +248,22 @@ Sites need images — hero visuals, section photos, atmospheric backgrounds, og:
 
 1. **List the image slots** the site needs and confirm the brief's style descriptor (subject · lighting · mood · composition · photo/illustration/3D) + one palette/temperature anchor. Build each query from the brief's **image query seeds** plus that locked style + mood lexicon — only the subject slot varies per slot. Pass geometry as the API `orientation` param (hero → `landscape`, card/avatar → `square` [Unsplash: `squarish`], sidebar → `portrait`), not in the text. Track chosen image ids in a `Set` to de-dupe.
 
-2. **Keyed image API first — the primary niche-tailored source.** When an image-API key is present, search it with the brief's query seeds, then **download the chosen file's bytes into `public/`** (download, don't hot-link). Two providers, auto-selected by which key is set:
+2. **Higgsfield first — the primary source when its MCP is connected.** If the `higgsfield_generate_image` tool is available, **generate** each slot's image from the brief's style descriptor + query seeds (async: kick the job, poll with `higgsfield_wait_for_job`/`higgsfield_get_job`, then **download the bytes into `public/`**). This sits at the top of the chain — anything it doesn't serve falls through to the keyed API below. Tier 4-5 sites may also generate **scroll-driven video** here (start frame + end frame → first-last-frame/image-to-video model) — see the Motion section; gate it on `higgsfield_check_cost` + opt-in because video spends real credits. Full contract in `references/higgsfield.md`. If Higgsfield isn't connected, skip straight to the keyed API.
+
+3. **Keyed image API — the primary niche-tailored source when Higgsfield is absent.** When an image-API key is present, search it with the brief's query seeds, then **download the chosen file's bytes into `public/`** (download, don't hot-link). Two providers, auto-selected by which key is set:
    - **Pexels (recommended default)** — free, generous limits, **no required attribution**. `GET https://api.pexels.com/v1/search?query=…&orientation=…&per_page=15` with header `Authorization: <PEXELS_API_KEY>`; download `src.large2x`.
    - **Unsplash (alternative)** — `GET https://api.unsplash.com/search/photos?query=…&orientation=…` with header `Authorization: Client-ID <UNSPLASH_ACCESS_KEY>`; download `urls.full`/`urls.regular`. **Unsplash adds two mandatory compliance steps:** (a) the instant an image is selected, fire one authenticated `GET` to the photo's `links.download_location` (tracking only — discard the response body); (b) **render visible attribution** — "Photo by [`user.name`](`user.links.html`) on [Unsplash](https://unsplash.com)" with `?utm_source=website_generator&utm_medium=referral` on both links — written into the generated `README.md`/`CREDITS.md` and a page credit. Pexels needs neither.
    - **If both keys are set, Pexels is used. If neither is set, skip silently to Neurascapes** — generation never hard-fails for a missing key.
 
-3. **Neurascapes — for photographic / atmospheric slots the API missed.** [Neurascapes](https://www.neurascapes.com/) is a free, royalty-free library of curated AI photos; commercial use, no attribution. Server-rendered, so a plain `WebFetch` works (no API/MCP). Match a collection to the niche + style descriptor and **download into `public/`.**
+4. **Neurascapes — for photographic / atmospheric slots the API missed.** [Neurascapes](https://www.neurascapes.com/) is a free, royalty-free library of curated AI photos; commercial use, no attribution. Server-rendered, so a plain `WebFetch` works (no API/MCP). Match a collection to the niche + style descriptor and **download into `public/`.**
 
-4. **Canva — for designed graphics and missing matches.** When the slot needs a *designed* asset (og:image, branded composition, illustration, anything with text/layout), generate it with the **Canva MCP**: `generate-design` / `generate-design-structured` → `export-design` to PNG → save into `public/`. One-time browser login (free account) on first call is expected.
+5. **Canva — for designed graphics and missing matches.** When the slot needs a *designed* asset (og:image, branded composition, illustration, anything with text/layout), generate it with the **Canva MCP**: `generate-design` / `generate-design-structured` → `export-design` to PNG → save into `public/`. One-time browser login (free account) on first call is expected.
 
-5. **Fallback placeholder (always succeeds).** If nothing supplies an image, leave a styled `<div>` in the brief's palette plus a comment naming exactly what image belongs there — the layout never breaks and the user can drop one in later.
+6. **Fallback placeholder (always succeeds).** If nothing supplies an image, leave a styled `<div>` in the brief's palette plus a comment naming exactly what image belongs there — the layout never breaks and the user can drop one in later.
 
 **Brand logos — `logo_search` (when the Magic MCP is configured).** Photo slots use the chain above; **logo** slots (nav/footer brand mark, an "as seen in" / partner / integration row) are a different asset type. When `logo_search` is available, use it to fetch logos as **SVG/JSX/TSX** (crisp, themeable — not raster) for those slots. It complements the photo chain, it does not replace it. If the tool is absent, fall back to a styled placeholder logo slot with a comment. See `references/21st-dev-mcp.md`.
 
-Apply the same style descriptor across every tier above so API photos, Neurascapes, and Canva assets sit together cleanly.
+Apply the same style descriptor across every tier above so Higgsfield-generated visuals, API photos, Neurascapes, and Canva assets sit together cleanly.
 
 > **Security — generation-time only; NEVER prefix an image key with `VITE_`/`NEXT_PUBLIC_` and never write it into the generated project (that inlines it into the public bundle).** The image-API key is read **only here, at generation time**, from a process env var (`PEXELS_API_KEY` / `UNSPLASH_ACCESS_KEY`), optionally loaded from a **gitignored `.env` in this skill folder** (see the skill's `.env.example`). The key calls `api.pexels.com` / `api.unsplash.com`, the **bytes are downloaded into `public/`**, and the key is dropped there forever — not into the project's `.env`, `vite.config`, a config file, or an `<img>` URL. The only artifact crossing into the shipped site is image bytes. This skill repo is **public** — never commit a real key.
 
@@ -322,6 +324,17 @@ Magic UI also ships its own Claude skill — call `Skill(skill="magic-ui")` for 
 
 Cult UI, Skiper UI, and Watermelon are plain registries (no Claude skill) — install them per the contract in the reference file. Some components need extra deps (e.g. `cobe` + `motion` for Magic UI's `globe`, `recharts` for Watermelon charts) or global CSS keyframes (e.g. `marquee`) — the reference file and each component's page flag these.
 
+### Layer 3 — Generated scroll video (Higgsfield · Tier 4-5 · opt-in)
+
+When the **Higgsfield MCP** is connected, a scroll set-piece can be a *generated video* rather than coded motion — the "make keyframes, fill the in-between" pipeline:
+
+1. **Keyframes** — generate a **start frame** and an **end frame** with `higgsfield_generate_image` on the locked palette + style descriptor (or reuse an already-generated hero still as the start frame).
+2. **Tween to video** — feed both frames to `higgsfield_generate_video` with a **first-last-frame / image-to-video** model (Kling Omni FLF, Seedance, Image2Video). Higgsfield renders the motion between them — that *is* the filler-frame step; you don't render frames by hand.
+3. **Cost-gate** — call `higgsfield_check_cost` first and respect the user's credit budget; generate clips **sequentially**, not a fan-out. Video is paid generation, so this is **opt-in per site and Tier 4-5 only**.
+4. **Wire for scroll** — download the clip into `public/`, put it in `<video muted playsinline preload="auto">`, and **scrub `currentTime` from scroll progress** (`useScroll` → map to `video.currentTime`), pinning the section. Honor `prefers-reduced-motion` (fall back to a static frame).
+
+Full contract + tool list in `references/higgsfield.md`. The restraint guardrail below still governs this — one generated set-piece, not a reel.
+
 ### Restraint guardrail (required)
 
 More motion is not more better. Magic UI's own guidance and `emil-design-eng` enforce the same rule:
@@ -330,6 +343,7 @@ More motion is not more better. Magic UI's own guidance and `emil-design-eng` en
 - **Start with 1 primary effect + 1 supporting effect per viewport** — one hero anchor (e.g. `globe`) plus one ambient layer (e.g. `particles`), not three stacked effects.
 - **Never stack multiple expensive animated backgrounds** in one viewport — it wrecks performance and contrast.
 - **Animated backgrounds must not reduce text contrast** — verify against the locked palette from the Quality Trio.
+- **Generated scroll video (Higgsfield Layer 3) is one set-piece, not a default** — it costs real credits and ships a heavy asset; use at most one per site, Tier 4-5, after `higgsfield_check_cost`. Don't pair it with a competing registry hero in the same viewport.
 - The Step 6 polish pass runs `emil-design-eng` (Tier 3+) specifically to catch over-animation, janky timing, and motion that fights the content. If it flags excess, **cut motion — don't add more.**
 
 ## Design quality — call companion skills
@@ -412,7 +426,9 @@ These are bundled with Taste Skill v2 and live as standalone skills. Pick one wh
 | `gpt-taste` | Tier 4-5, GSAP-heavy scroll storytelling with strict AIDA structure |
 | `stitch-design-taste` | When the user wants a DESIGN.md emitted for Google Stitch as a deliverable |
 
-### Image generation alternatives (Step 5 supplements to the image API / Neurascapes / Canva)
+### Image & video generation alternatives (Step 5 supplements to the image API / Neurascapes / Canva)
+
+**Primary generated source: the Higgsfield MCP** (not a skill) — when connected it leads the Step 5 chain for stills *and* powers Tier 4-5 scroll video (start/end frames → first-last-frame model). Keyless, account/credit-based; see `references/higgsfield.md`. The skills below are situational supplements when you want section-by-section design refs or mockups.
 
 | Skill | Use when |
 |-------|----------|
@@ -432,6 +448,7 @@ These are bundled with Taste Skill v2 and live as standalone skills. Pick one wh
 - **`magic-ui`** — animated component registry (globes, particle fields, marquees, shimmer/shiny buttons, animated text). The primary motion source for Tier 3-5 — see "Motion & interactive components" above for the family → category map and install contract.
 - **Component registries (Cult UI · Skiper UI · Watermelon)** — shadcn registries (not skills) for animated/functional components beyond Magic UI. Cult = tactile/shader heroes + iOS widgets; Skiper = Apple-style scroll storytelling; Watermelon = app/dashboard UI, charts, and blocks (and the only registry that also serves Tier 1-2). Full catalogs + install contract in `references/component-registries.md`.
 - **21st.dev Magic MCP** — a live MCP server (not a skill, not a shadcn registry) that supersedes the frozen 21st.dev snapshot when configured: `inspiration` (Step 3 live search), `builder` (Step 4 bespoke code), `logo_search` (Step 5 logos), `refiner` (Step 6 polish). Preferred over the static 21st.dev prompts when present; falls back to them when absent. Setup + tool contract in `references/21st-dev-mcp.md`.
+- **Higgsfield MCP** — a hosted MCP server (not a skill) for AI **image + video** generation (Kling/Seedance/Veo/Sora). When connected it's the primary Step 5 imagery source and powers the Tier 4-5 opt-in scroll-video pipeline (keyframes → first-last-frame model). Keyless (account/credit auth), async job model; falls back to the keyed image API → Neurascapes → Canva → placeholder chain when absent. Setup + tool contract in `references/higgsfield.md`.
 
 ## Companion skills manifest (`skills-lock.json`)
 
