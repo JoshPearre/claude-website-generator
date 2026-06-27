@@ -13,9 +13,26 @@ Trigger on any request to build, generate, or scaffold a website, web app, landi
 
 ## Workflow overview
 
-Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → sample prompts from the library **(brief biases the categories)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(keyed image API queried from the brief's style descriptor, downloaded into `public/`)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → report what was used.
+Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → sample prompts from the library **(brief biases the categories; live 21st.dev via the Magic MCP when configured — see section below)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(keyed image API queried from the brief's style descriptor, downloaded into `public/`)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → report what was used.
 
 Follow the steps below in order. **Do not write any files until Step 4.** The **Quality Trio** call (see "Design quality" section below) happens between Step 3 and Step 4 and is required, not optional. The **polish pass** (Step 6) runs after Step 5 and is also required — the scaffold is not "done" until critique returns clean.
+
+---
+
+## 21st.dev Magic MCP — live component source (preferred when configured)
+
+This skill ships a **frozen snapshot** of 21st.dev (28 hand-harvested prompts in `prompts/`). When the user has the **21st.dev Magic MCP** (`@21st-dev/magic`) configured, prefer the **live** server instead — it searches the whole current library and generates real component code, where the snapshot only points at URLs. The static prompts stay as the **offline fallback** and keep counting toward the Step 3 source-diversity rule.
+
+**Detect it:** the tools surface as `mcp__<server>__<tool>` (e.g. `mcp__magic__21st_magic_component_builder`, depending on the server name the user registered). Four tools, threaded across the pipeline:
+
+| Tool | What it does | Used in |
+|---|---|---|
+| `21st_magic_component_inspiration` | live-searches 21st.dev, returns component JSON + previews | **Step 3** (sample) |
+| `21st_magic_component_builder` | generates a complete React/TS component from a description | **Step 4** (compose) |
+| `logo_search` | brand logos as SVG/JSX/TSX (SVGL) | **Step 5** (assets) |
+| `21st_magic_component_refiner` | redesigns/refines an existing component | **Step 6** (polish) |
+
+**Fallback contract:** if those tools are **not** present the MCP isn't configured — fall back silently to the static 21st.dev prompts + the shadcn registries (`references/component-registries.md`), never hard-fail, and note in the run report that the live MCP wasn't available. **Setup, the per-tool contract, and the full fallback rules live in `references/21st-dev-mcp.md` — read it once when the MCP is in play.**
 
 ---
 
@@ -182,6 +199,8 @@ Sampling rules:
 3. From each chosen file, randomly select **1-2 prompts whose `Best for tiers` field includes the selected tier**.
 4. **Variety rule:** the full selected set must span at least **3 different source libraries** (the `Source:` field). If it doesn't, resample until it does. This stops every site from looking like one library's house style.
 
+**Live 21st.dev via the Magic MCP (preferred when configured).** If the `21st_magic_component_inspiration` tool is available, use it for the 21st.dev portion of the sample instead of the frozen `prompts/` entries: query it with the Niche Design Brief's vocabulary (native components + motion character + style descriptor) for each chosen category, and treat the live results as the 21st.dev candidates. **21st.dev still counts as one source** under the variety rule above — don't let live access turn every section into a 21st.dev component. If the tool is absent, use the static 21st.dev prompts as normal. See `references/21st-dev-mcp.md`.
+
 If the library is still empty (no prompts harvested yet), tell the user to run the harvest first — see `harvest/HARVEST_GUIDE.md`.
 
 ## Step 4 — Compose the project scaffold
@@ -189,6 +208,8 @@ If the library is still empty (no prompts harvested yet), tell the user to run t
 Default stack: **Vite + React + Tailwind + Framer Motion**. Use vanilla HTML/CSS/JS instead if the sampled prompts clearly call for it, or a leaner stack for Tier 1 (a static dashboard rarely needs Framer Motion). For **Tier 4-5 sites that sample 3D prompts**, also add **React Three Fiber** (`@react-three/fiber` + `@react-three/drei`) for code-based 3D, or **`@splinetool/react-spline`** to embed a Spline scene — add these only when a 3D prompt is actually used so non-3D sites stay lean.
 
 **Motion & interactive components.** Framer Motion is already in the default stack — use it as the baseline for reveals, layout transitions, and gestures (the "Motion & interactive components" section maps which patterns to reach for per tier). For higher-impact pieces — animated heroes, particle/shader backgrounds, marquees, tactile buttons, scroll storytelling, charts, or whole blocks — pull from a **shadcn component registry** rather than hand-rolling. Four are wired in, each with a distinct flavor: **Magic UI** (ambient effects, animated text), **Cult UI** (tactile/shader heroes, iOS widgets), **Skiper UI** (Apple-style scroll storytelling), and **Watermelon** (app/dashboard UI, charts, blocks). See `references/component-registries.md` for the full catalogs, flavors, licenses, and family→category maps.
+
+**21st.dev Magic builder (when the MCP is configured).** `21st_magic_component_builder` is a fifth, more powerful source: where a registry hands you a fixed component, the builder **generates bespoke React/TS code** to a description. Reach for it when no registry piece fits a sampled prompt, or when you want the 21st.dev implementation of a sampled idea rather than just its URL. Describe the component from the sampled prompt + the brief's vocabulary, take the returned code into `src/components/`, then **re-bind the locked palette/font tokens (Step 3.5) onto it** — builder output never introduces its own palette, and it still passes the Step 6 polish pass like any hand-written component. The one-flavor-per-site restraint guardrail applies: don't stack a builder hero on top of a registry hero. See `references/21st-dev-mcp.md`.
 
 When the sampled set includes *any* registry component, wire shadcn into the scaffold once:
 
@@ -238,6 +259,8 @@ Sites need images — hero visuals, section photos, atmospheric backgrounds, og:
 
 5. **Fallback placeholder (always succeeds).** If nothing supplies an image, leave a styled `<div>` in the brief's palette plus a comment naming exactly what image belongs there — the layout never breaks and the user can drop one in later.
 
+**Brand logos — `logo_search` (when the Magic MCP is configured).** Photo slots use the chain above; **logo** slots (nav/footer brand mark, an "as seen in" / partner / integration row) are a different asset type. When `logo_search` is available, use it to fetch logos as **SVG/JSX/TSX** (crisp, themeable — not raster) for those slots. It complements the photo chain, it does not replace it. If the tool is absent, fall back to a styled placeholder logo slot with a comment. See `references/21st-dev-mcp.md`.
+
 Apply the same style descriptor across every tier above so API photos, Neurascapes, and Canva assets sit together cleanly.
 
 > **Security — generation-time only; NEVER prefix an image key with `VITE_`/`NEXT_PUBLIC_` and never write it into the generated project (that inlines it into the public bundle).** The image-API key is read **only here, at generation time**, from a process env var (`PEXELS_API_KEY` / `UNSPLASH_ACCESS_KEY`), optionally loaded from a **gitignored `.env` in this skill folder** (see the skill's `.env.example`). The key calls `api.pexels.com` / `api.unsplash.com`, the **bytes are downloaded into `public/`**, and the key is dropped there forever — not into the project's `.env`, `vite.config`, a config file, or an `<img>` URL. The only artifact crossing into the shipped site is image bytes. This skill repo is **public** — never commit a real key.
@@ -250,7 +273,8 @@ Once Step 5 finishes, the scaffold is "compiled" but not yet "designed". Run the
 2. `Skill(skill="impeccable", args="polish")` — applies the fixes critique surfaced.
 3. Loop 1–2 until critique returns clean.
 4. **Tier 3+ only:** `Skill(skill="emil-design-eng")` — consult on motion, hover/focus states, and transition timing for the hero, primary CTA, nav, and key cards. Skip on Tier 1-2 sites where motion is minimal.
-5. **Production-bound only:** `Skill(skill="impeccable", args="audit")` — final 29-rule deterministic anti-pattern scan, JSON output suitable for a CI gate.
+5. **When the Magic MCP is configured (optional):** pass the few components most worth getting right (hero / primary CTA / key cards) through `21st_magic_component_refiner` for a 21st.dev-grade redesign, then **re-run step 1 (`impeccable critique`)** so the refined output still clears the anti-pattern gate and stays bound to the locked tokens. Refine the standouts — don't re-skin the whole site. See `references/21st-dev-mcp.md`.
+6. **Production-bound only:** `Skill(skill="impeccable", args="audit")` — final 29-rule deterministic anti-pattern scan, JSON output suitable for a CI gate.
 
 See the "Design quality" section below for the full call signatures and when to deviate.
 
@@ -374,6 +398,8 @@ Skill(skill="emil-design-eng")
 
 Encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details — timing curves, layered transitions, micro-interactions — that separate "fine" from "great". Use it case-by-case to review motion, hover/focus states, and transition timing on the components most worth getting right (hero, primary CTA, nav, key cards). Skip on Tier 1-2 sites where motion is minimal anyway.
 
+**When the 21st.dev Magic MCP is configured**, you may also pass the standout components through `21st_magic_component_refiner` here, then re-run `impeccable critique` so the refined output still clears the gate and stays on the locked tokens. See `references/21st-dev-mcp.md`.
+
 ### Tier-mapped style overrides (use one *instead of* `ui-ux-pro-max`'s style)
 
 These are bundled with Taste Skill v2 and live as standalone skills. Pick one when the user's brief clearly calls for that aesthetic — it replaces the style choice from the trio, not the palette/font:
@@ -405,6 +431,7 @@ These are bundled with Taste Skill v2 and live as standalone skills. Pick one wh
 - **`full-output-enforcement`** — invoke if the scaffold starts emitting `// rest of code` or `...` placeholders. Forces unabridged output.
 - **`magic-ui`** — animated component registry (globes, particle fields, marquees, shimmer/shiny buttons, animated text). The primary motion source for Tier 3-5 — see "Motion & interactive components" above for the family → category map and install contract.
 - **Component registries (Cult UI · Skiper UI · Watermelon)** — shadcn registries (not skills) for animated/functional components beyond Magic UI. Cult = tactile/shader heroes + iOS widgets; Skiper = Apple-style scroll storytelling; Watermelon = app/dashboard UI, charts, and blocks (and the only registry that also serves Tier 1-2). Full catalogs + install contract in `references/component-registries.md`.
+- **21st.dev Magic MCP** — a live MCP server (not a skill, not a shadcn registry) that supersedes the frozen 21st.dev snapshot when configured: `inspiration` (Step 3 live search), `builder` (Step 4 bespoke code), `logo_search` (Step 5 logos), `refiner` (Step 6 polish). Preferred over the static 21st.dev prompts when present; falls back to them when absent. Setup + tool contract in `references/21st-dev-mcp.md`.
 
 ## Companion skills manifest (`skills-lock.json`)
 

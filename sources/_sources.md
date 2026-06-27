@@ -7,7 +7,7 @@ Tracks every site considered as a prompt-library source, its status, and how to 
 
 | Source | URL | Status | Render | Harvest method | Notes |
 |---|---|---|---|---|---|
-| 21st.dev | https://21st.dev/community/components | harvested | Hybrid (JS) | firecrawl-crawl, or Magic MCP | Best source. React components + AI prompts. Free Hobby tier. |
+| 21st.dev | https://21st.dev/community/components | harvested + live MCP | Hybrid (JS) | firecrawl-crawl (snapshot), **Magic MCP (preferred, live)** | 28 prompts harvested as the offline fallback; the **Magic MCP** is the preferred live source when configured — search + generate code + logos + refine. Setup/contract in `references/21st-dev-mcp.md`. |
 | VibeUI | https://vibeui.online/ | harvested | Server-rendered | firecrawl-scrape / WebFetch | ~92 free copy-paste UI layout prompts. |
 | Trickle prompt library | https://trickle.so/blog/trickle-vibe-coding-prompt-library | harvested | Server-rendered | WebFetch / firecrawl-scrape | Blog post; ~50 categorized copy-paste prompts. |
 | VibeCodeComponents | https://vibecodecomponents.com/ | harvested | JS-rendered | firecrawl-scrape | 200+ component prompts. Verify free vs. paid before relying on it. |
@@ -31,6 +31,8 @@ For login-walled or visual-only sites (Mobbin, Spline, MotionSites), the only sa
 Some sources are **shadcn component registries** rather than prompt libraries — they supply installable React components, not text prompts. They're wired into SKILL.md's "Motion & interactive components" section and catalogued in `references/component-registries.md`, so they carry `Status: reference` here (provenance only) and are **not** run through the harvest. Current registries: **Magic UI** (via its Claude skill), **Cult UI**, **Skiper UI**, **Watermelon UI**.
 
 If you later want their *patterns* as text prompts too (e.g. to feed the Step 3 variety rule), add a `pending` row and run the harvest as normal — the registry integration and a prompt-harvest can coexist.
+
+**21st.dev is also wired as a live MCP**, distinct from the shadcn registries above: the **Magic MCP** (`@21st-dev/magic`) is preferred over the harvested 21st.dev snapshot whenever it's configured, and the snapshot remains the offline fallback. It isn't a shadcn registry and isn't harvested — see `references/21st-dev-mcp.md`.
 
 ## Adding a source
 

@@ -1,0 +1,12 @@
+{
+  "// note": "Copy this to .mcp.json in the directory you generate sites from to give Claude Code the 21st.dev Magic MCP. The server reads its key from API_KEY; ${MAGIC_API_KEY} expands from your shell environment so no real key is committed (this repo is public). Get a free key at https://21st.dev/magic/console. See references/21st-dev-mcp.md.",
+  "mcpServers": {
+    "magic": {
+      "command": "npx",
+      "args": ["-y", "@21st-dev/magic@latest"],
+      "env": {
+        "API_KEY": "${MAGIC_API_KEY}"
+      }
+    }
+  }
+}

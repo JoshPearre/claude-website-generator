@@ -89,7 +89,7 @@ After files exist, it runs a **polish pass**:
 | Firecrawl key (harvest) | Copy `.env.example` → `.env`, add key from [firecrawl.dev](https://firecrawl.dev) (free tier available) |
 | Image API (Pexels/Unsplash) | Copy `.env.example` → `.env`, add `PEXELS_API_KEY` ([pexels.com/api](https://www.pexels.com/api/), free) or `UNSPLASH_ACCESS_KEY` — sources niche-tailored photos at generation time |
 | Canva MCP | One-time browser login — generates designed image assets |
-| 21st.dev Magic MCP | Component generator — free key at [21st.dev/magic/console](https://21st.dev/magic/console), configured in Claude Code MCP settings |
+| 21st.dev Magic MCP | **Live** 21st.dev components (search + generate code + logos + refine) — supersedes the frozen 21st.dev snapshot when configured. Key + setup below. |
 
 Images default to [Neurascapes](https://neurascapes.com) (free royalty-free AI photos, no setup); add a Pexels/Unsplash key above for sharper, niche-tailored stock photos.
 
@@ -109,6 +109,25 @@ Step 5 can pull real stock photos tailored to the niche brief. Provide **one** k
 | Unsplash (alt) | `UNSPLASH_ACCESS_KEY` | Requires attribution + download-trigger — [unsplash.com/developers](https://unsplash.com/developers) |
 
 Copy `.env.example` → `.env` and paste your key (or export it in your shell). **The key is read only while the skill runs; images are downloaded into the generated project's `public/`, and the key is never written into the generated site or committed.** `.env` is gitignored — never commit a real key (this repo is public). If no key is set, images fall back to Neurascapes → Canva → placeholder.
+
+---
+
+## 21st.dev Magic MCP (optional — live components)
+
+The skill ships a **frozen snapshot** of 21st.dev (28 prompts baked into `prompts/`). Connect the [**21st.dev Magic MCP**](https://github.com/21st-dev/magic-mcp) (`@21st-dev/magic`) and the skill prefers the **live** server instead — searching the whole current library and generating real component code, where the snapshot only points at URLs. The four tools thread across the workflow: `inspiration` (Step 3 search) · `builder` (Step 4 generate code) · `logo_search` (Step 5 logos) · `refiner` (Step 6 polish). When it isn't configured, the skill falls back to the snapshot + shadcn registries — it never hard-fails.
+
+**Get a key** (free to start, then credit-metered — see below): [21st.dev/magic/console](https://21st.dev/magic/console).
+
+**Register it with Claude Code** (the MCP lives in *your* environment, not this skill folder):
+
+```sh
+export MAGIC_API_KEY=...   # paste your 21st.dev key
+claude mcp add magic -e API_KEY=$MAGIC_API_KEY -- npx -y @21st-dev/magic@latest
+```
+
+Or copy [`mcp.json.example`](mcp.json.example) → `.mcp.json` in the directory you generate sites from (it uses `${MAGIC_API_KEY}` expansion, so it's safe to commit — the key stays in your shell). Full setup, tool contract, and fallback rules: [`references/21st-dev-mcp.md`](references/21st-dev-mcp.md).
+
+> **Cost:** the API key is free to create and there's a free tier to try it, but generation is **credit-metered** (a small monthly free allowance, then paid plans from ~$20/mo) — see [21st.dev pricing](https://help.21st.dev/magic-chat/pricing). It's free to get started, not unlimited-free. The skill works fine without it via the snapshot fallback.
 
 ---
 
@@ -154,6 +173,7 @@ website-generator/
 ├── README.md                     # This file
 ├── skills-lock.json              # Companion skills manifest (16 skills, pinned)
 ├── .env.example                  # FIRECRAWL_API_KEY + image-API key templates
+├── mcp.json.example              # Copyable .mcp.json for the 21st.dev Magic MCP
 ├── prompts/                      # Prompt library (10 UI categories × 5 tiers)
 │   ├── _index.md
 │   ├── hero-sections.md
@@ -171,7 +191,8 @@ website-generator/
 ├── directions/
 │   └── design-directions.md      # 5 palette+font+posture anchors
 ├── references/
-│   └── component-registries.md   # shadcn registry catalogs + install contracts
+│   ├── component-registries.md   # shadcn registry catalogs + install contracts
+│   └── 21st-dev-mcp.md           # 21st.dev Magic MCP setup, tools, fallback contract
 ├── sources/
 │   └── _sources.md               # Harvest source tracking
 ├── harvest/                      # Workflow for populating the prompt library
