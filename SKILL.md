@@ -1,6 +1,6 @@
 ---
 name: website-generator
-description: Generate a complete multi-file website project scaffold by composing UI prompts from a curated, design-intensity-tiered prompt library. Use this skill whenever the user wants to build, generate, scaffold, redesign, or create a website, web app, landing page, or marketing site — including phrases like "build me a website", "generate a site", "create a landing page", "make a site for my [business/niche]", or any request to produce a website for a specific niche or audience. The skill matches design intensity (minimal utility to experimental/maximalist) to the site's purpose and produces a real Vite + React project folder.
+description: Generate a complete multi-file website project scaffold by composing UI prompts from a curated, design-intensity-tiered prompt library. Use this skill whenever the user wants to build, generate, scaffold, redesign, or create a website, web app, landing page, or marketing site — including phrases like "build me a website", "generate a site", "create a landing page", "make a site for my [business/niche]", or any request to produce a website for a specific niche or audience. The skill matches design intensity (minimal utility to experimental/maximalist) to the site's purpose and produces a real Vite + React project folder. Also use this skill whenever the user wants to create 3D / scroll-driven / Apple-style scroll animations — scroll-scrubbed product or video heroes (e.g. "create 3D scroll animations", "scroll animation", "scrollytelling hero", or "turn this MP4/product into a scroll-driven frame animation").
 ---
 
 # Website Generator
@@ -186,6 +186,8 @@ If the user replies with a shift command, move one tier down ("tone it down") or
 
 **If the user has not named a brand or given a reference URL**, also auto-select a **design direction** here — the aesthetic anchor that supplies palette + fonts (see `directions/design-directions.md` for the soft niche/tier → direction map) — and name it in the same line, e.g. *"Direction: Modern minimal — name a brand or pick another direction to change the look."* The direction is bound to `:root` in Step 3.5; naming it now lets the user redirect early.
 
+**Also decide the `higgs_hero` toggle here** (the Higgs Field scroll-interactive video hero — see its dedicated section below). Default it from tier + niche: **ON** for Tier 5 or visually-driven niches (restaurant, hospitality, real estate, automotive, fashion/beauty, fitness, events, agency, portfolio, product launch); **OFF** for Tier 1–3 and text/utility niches (dashboards, SaaS consoles, law/medical/finance intake, B2B docs, info sites). State it in the same transparency line and let the user flip it — *"Hero: Higgs scroll-video ON (recommended) — say 'simple hero' to turn it off."* "go wild" / "maximum" / "most interactive" / "make it cinematic" forces it ON; "tone it down" / "keep it simple" / "make it fast" forces it OFF.
+
 ## Step 3 — Sample prompts from the library
 
 The library is split into ten categories, each its own file in `prompts/` (see `prompts/_index.md` for the map):
@@ -345,6 +347,71 @@ More motion is not more better. Magic UI's own guidance and `emil-design-eng` en
 - **Animated backgrounds must not reduce text contrast** — verify against the locked palette from the Quality Trio.
 - **Generated scroll video (Higgsfield Layer 3) is one set-piece, not a default** — it costs real credits and ships a heavy asset; use at most one per site, Tier 4-5, after `higgsfield_check_cost`. Don't pair it with a competing registry hero in the same viewport.
 - The Step 6 polish pass runs `emil-design-eng` (Tier 3+) specifically to catch over-animation, janky timing, and motion that fights the content. If it flags excess, **cut motion — don't add more.**
+
+## 3D scroll animation — scroll-scrubbed hero (Higgs Field → flip-book canvas)
+
+A cinematic hero (or standalone section) whose footage is **scrubbed frame-by-frame by scroll** — the Apple AirPods / MacBook technique: as the visitor scrolls, an AI-generated product clip morphs (a keyboard explodes into its parts, headphones X-ray to their drivers, a can bursts into its botanicals). It is the single highest-impact "wow" this skill produces — and the most expensive — so it is **applied selectively, not on every site**: the `higgs_hero` recommendation in Step 2 gates it (ON for Tier 5, visually-driven Tier-4 niches, or an explicit user request; OFF otherwise), and the user can always override.
+
+**Triggers — turn this mode ON regardless of the default when the user asks to** "create 3D scroll animations", "scroll animation", "Apple-style scroll", a "scroll-scrub / scrollytelling hero", or to "turn this video/product into a scroll-driven frame animation" — or hands you an MP4 to drive by scroll. When triggered, run the pipeline below even if the rest of the site is minimal (a single hero + scroll section + CTA is a perfectly good deliverable).
+
+**How it actually works (it is NOT a `<video>` that plays on scroll):**
+1. **Start frame** — an AI still of the product at rest.
+2. **End frame** — a second still showing the transition's destination (exploded / X-ray / assembled-from-nothing), generated **using the start frame as a reference image** so the product stays identical.
+3. **Transition video** — an image-to-video model interpolates start→end into a short clip.
+4. **Flip-book** — ffmpeg extracts the clip to a WebP image sequence; the page preloads the frames and draws the one matching scroll progress onto a `<canvas>`. Scrubbing a real `<video>`'s `currentTime` is unreliable (decode jank, blank frames); a preloaded WebP sequence on canvas is pixel-perfect and buttery.
+
+> **Background-match rule (do this or the illusion breaks):** the keyframes' background MUST match the section background they sit on, so the product looks like it *floats* — otherwise the visitor sees the image's rectangle/edges. Decide the section background color first, then generate the stills on that exact color ("…on a clean `<bg>` background, no surface, no shadow, no reflections"). White-bg product on a dark section = visible box.
+
+### Toggle + recommendation (`higgs_hero`)
+
+The default is decided in **Step 2** from tier + niche and stated in the transparency line; the user can always override:
+
+- **Default ON** — Tier 5 (experimental/maximalist).
+- **Default ON even at Tier 4 for visually-driven niches** — restaurant/food, hospitality/hotels, real estate, automotive, fashion/beauty, fitness/wellness, events/weddings, creative agency, product launch, portfolio, travel.
+- **Default OFF** — Tier 1–3 and text/utility niches: dashboards, SaaS consoles, law/medical/finance intake, B2B docs, nonprofits/info sites, anything where speed and clarity beat spectacle.
+- **User overrides win:** "go wild" / "maximum" / "most interactive" / "make it cinematic" → force ON (and treat as Tier-5 motion). "tone it down" / "keep it simple" / "make it fast" → force OFF (standard hero).
+
+### Pipeline (when `higgs_hero` is ON or the mode is triggered)
+
+Four stages; each has a graceful fallback so a missing key or unauthenticated tool never breaks the build. **The full canvas / ffmpeg / preload / scroll implementation lives in `references/scroll-animation-best-practices.md` — read it and follow it precisely.** Ready-to-use image prompts (start frame, exploded/X-ray end frame, transition-video prompt + worked examples) are in `references/scroll-keyframe-prompts.md`.
+
+> **If the user supplies their own MP4** (or a tool like Veo emits a clip directly), **skip stages 1–2 entirely** and start at **stage 3** (frame extraction) using their clip as `public/scroll-source.mp4`.
+
+**1 — Two keyframes (start + end).** Generate from the Niche Design Brief's **style descriptor + image query seeds**, on the section's background color (background-match rule above). Source, first match wins:
+- **Higgs Field — Nano Banana 2 (recommended; the user has Higgs Field wired up).**
+  - Start: `higgsfield generate create nano_banana_2 --prompt "<product hero, on <bg> background>" --resolution 2k --wait`
+  - End (pass the start frame as a reference so the product stays identical): `higgsfield generate create nano_banana_2 --prompt "<transition destination — exploded / X-ray>, keep the <bg> background, no text" --image <start_frame_id_or_url> --wait`
+  - The Higgs Field session can expire — if a generate call fails auth, tell the user to run `higgsfield auth login` once, then retry.
+  - **Verify the contract before relying on it:** the model IDs and flags here (`nano_banana_2`, `seedance_2_0`/`kling3_0`, `--image`, `--start-image`/`--end-image`, `--resolution`, `--aspect_ratio`, `--wait`) are representative as of this writing — run `higgsfield generate create --help` (or defer to the `higgsfield-generate` skill) to confirm current names/flags and the output/download semantics before generating.
+  - **Pick one aspect ratio** from the hero section/canvas and use it for the start still, end still, **and** the video (e.g. `2:3`/`9:16` for a tall product, `16:9` for a wide hero) — mismatched aspects distort on the canvas.
+- Fallbacks: **GPT Image 2** (`gpt_image_2`) via Higgs or the `imagegen-frontend-web` skill; **Gemini Imagen**; **Canva MCP** for a designed/branded frame.
+- Save both into `public/` (`hero-start.webp`, `hero-end.webp`). The start frame doubles as the canvas poster and og:image.
+
+**2 — Transition video (start-frame + end-frame).** Feed both keyframes to an image-to-video model to interpolate the motion. Keep it **short (4–6s), muted, simple motion** — no wild camera moves (they smear on scrub), and decline any "enhance prompt" option.
+- **Higgs Field — Seedance 2.0 (best) or Kling 3.0 (cheaper):** `higgsfield generate create seedance_2_0 --start-image <start_id> --end-image <end_id> --duration 5 --aspect_ratio <ar> --wait` (swap `kling3_0` to save credits). Download into `public/scroll-source.mp4`.
+- **Credit discipline — the video step is the only real cost:** lock both stills cheaply first, then spend video credits once. Confirm the Higgs balance before this step.
+- If image-to-video is unavailable / unauthenticated → **fall back to a static keyed-image hero** (the start frame) and stop; the layout never breaks.
+
+**3 — Flip-book extraction (ffmpeg; free, local).** First create/empty the output dir (`public/frames/`), and check the clip's duration so you can target **120–200 frames** — never thousands from a long clip:
+`ffprobe -v error -show_entries format=duration -of csv=p=0 public/scroll-source.mp4`
+Then extract with **both a duration and a frame-count cap**:
+`ffmpeg -y -i public/scroll-source.mp4 -t 6 -vf "fps=30,scale=1600:-1" -frames:v 200 -quality 80 public/frames/frame-%04d.webp`
+Pick `fps` so `duration × fps` lands in 120–200; `-frames:v 200` is a hard ceiling and `-t 6` caps the seconds consumed. WebP is 25–35% smaller than JPG at equal quality. If ffmpeg isn't installed, **ask the user before installing system software** (e.g. `winget install Gyan.FFmpeg` on Windows) or point at an existing/portable ffmpeg — don't silently install.
+
+**4 — Scroll-scrub canvas component.** Build a `ScrollFrameCanvas` per `references/scroll-animation-best-practices.md`. Non-negotiables from that guide:
+- **Preload every frame upfront** behind a loading bar, in **batches of ~15–20** (browsers cap ~6 connections/host); reveal only once all frames are ready.
+- **Sticky pin + tall runway:** a `~400vh` container with a `position: sticky; top:0; height:100vh` wrapper; `progress = -rect.top / (rect.height - innerHeight)`.
+- **Separate scroll calc from render:** a `{ passive:true }` scroll listener (or Framer `useScroll`) sets `currentFrame` only; a `requestAnimationFrame` loop draws **only when the frame changed**. Never `drawImage` inside the scroll / `useMotionValueEvent` callback.
+- **Overlay cards tied to scroll ranges** (e.g. `{start:0.08,end:0.24}`), not timers, with CSS-transition fades and small gaps between phases.
+- **Polish:** optional radial-gradient mask on the canvas, subtle scroll-linked rotation, a thin top progress bar, glassmorphic overlay cards.
+- **Always honor `prefers-reduced-motion`** (`useReducedMotion()`) → render the static start frame, no scrubbing.
+
+### Scaffold + image notes
+- **Step 5:** when this mode is on, the two keyframes are a first-class image task (run before other image slots) so hero, poster, and og:image share one look and background.
+- **Step 4:** add the `ScrollFrameCanvas` component and a `public/frames/` directory. Framer Motion (already in the stack) covers the overlay reveals; add **GSAP + ScrollTrigger** only if you prefer its pin over CSS sticky. Log the hero choice in `App.jsx` + `README.md` like any sampled prompt.
+
+### Restraint
+One scroll-scrub hero per site; never stack it with other heavy animated backgrounds in the same viewport (decode + contrast cost). Keep the source clip short and the motion simple. If `emil-design-eng` (Step 6) flags jank or over-motion, shorten the clip or drop the frame count — don't pile on more.
 
 ## Design quality — call companion skills
 
