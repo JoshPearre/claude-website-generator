@@ -333,9 +333,9 @@ When the **Higgsfield MCP** is connected, a scroll set-piece can be a *generated
 1. **Keyframes** — generate a **start frame** and an **end frame** with `higgsfield_generate_image` on the locked palette + style descriptor (or reuse an already-generated hero still as the start frame).
 2. **Tween to video** — feed both frames to `higgsfield_generate_video` with a **first-last-frame / image-to-video** model (Kling Omni FLF, Seedance, Image2Video). Higgsfield renders the motion between them — that *is* the filler-frame step; you don't render frames by hand.
 3. **Cost-gate** — call `higgsfield_check_cost` first and respect the user's credit budget; generate clips **sequentially**, not a fan-out. Video is paid generation, so this is **opt-in per site and Tier 4-5 only**.
-4. **Wire for scroll** — download the clip into `public/`, put it in `<video muted playsinline preload="auto">`, and **scrub `currentTime` from scroll progress** (`useScroll` → map to `video.currentTime`), pinning the section. Honor `prefers-reduced-motion` (fall back to a static frame).
+4. **Wire for scroll — prefer the flip-book canvas, not `<video>` scrubbing.** Scrubbing a real `<video>`'s `currentTime` from scroll is unreliable (async decode → jank/blank frames). Instead extract the clip to a WebP frame sequence (ffmpeg) and scrub it on a `<canvas>` — the full, preferred implementation is the **"3D scroll animation — scroll-scrubbed hero"** section below. Honor `prefers-reduced-motion` (static start frame).
 
-Full contract + tool list in `references/higgsfield.md`. The restraint guardrail below still governs this — one generated set-piece, not a reel.
+Generation contract + tool list in `references/higgsfield.md`; the scrub/render contract is the **"3D scroll animation"** section below (+ `references/scroll-animation-best-practices.md`). The restraint guardrail below still governs this — one generated set-piece, not a reel.
 
 ### Restraint guardrail (required)
 
@@ -378,17 +378,14 @@ Four stages; each has a graceful fallback so a missing key or unauthenticated to
 > **If the user supplies their own MP4** (or a tool like Veo emits a clip directly), **skip stages 1–2 entirely** and start at **stage 3** (frame extraction) using their clip as `public/scroll-source.mp4`.
 
 **1 — Two keyframes (start + end).** Generate from the Niche Design Brief's **style descriptor + image query seeds**, on the section's background color (background-match rule above). Source, first match wins:
-- **Higgs Field — Nano Banana 2 (recommended; the user has Higgs Field wired up).**
-  - Start: `higgsfield generate create nano_banana_2 --prompt "<product hero, on <bg> background>" --resolution 2k --wait`
-  - End (pass the start frame as a reference so the product stays identical): `higgsfield generate create nano_banana_2 --prompt "<transition destination — exploded / X-ray>, keep the <bg> background, no text" --image <start_frame_id_or_url> --wait`
-  - The Higgs Field session can expire — if a generate call fails auth, tell the user to run `higgsfield auth login` once, then retry.
-  - **Verify the contract before relying on it:** the model IDs and flags here (`nano_banana_2`, `seedance_2_0`/`kling3_0`, `--image`, `--start-image`/`--end-image`, `--resolution`, `--aspect_ratio`, `--wait`) are representative as of this writing — run `higgsfield generate create --help` (or defer to the `higgsfield-generate` skill) to confirm current names/flags and the output/download semantics before generating.
+- **Higgs Field (recommended) — use the Higgs Field MCP when connected** (`higgsfield_generate_image`; keyless, account-authed — the repo's documented path). Generate the **start frame**, then the **end frame** using the start as a reference image, both on the section background; poll the job, then download the bytes into `public/`. **Discover the exact tool/model names at runtime — full contract in `references/higgsfield.md`.**
+  - **CLI fallback** (MCP not connected but the `higgsfield` CLI is installed): `higgsfield generate create <image-model> --prompt "<…>, on <bg> background" --resolution 2k --wait`, then the end frame with `--image <start_id>`. The CLI session can expire — if a call fails auth, have the user run `higgsfield auth login` once; confirm exact model/flag names with `higgsfield generate create --help` (or the `higgsfield-generate` skill).
   - **Pick one aspect ratio** from the hero section/canvas and use it for the start still, end still, **and** the video (e.g. `2:3`/`9:16` for a tall product, `16:9` for a wide hero) — mismatched aspects distort on the canvas.
 - Fallbacks: **GPT Image 2** (`gpt_image_2`) via Higgs or the `imagegen-frontend-web` skill; **Gemini Imagen**; **Canva MCP** for a designed/branded frame.
 - Save both into `public/` (`hero-start.webp`, `hero-end.webp`). The start frame doubles as the canvas poster and og:image.
 
 **2 — Transition video (start-frame + end-frame).** Feed both keyframes to an image-to-video model to interpolate the motion. Keep it **short (4–6s), muted, simple motion** — no wild camera moves (they smear on scrub), and decline any "enhance prompt" option.
-- **Higgs Field — Seedance 2.0 (best) or Kling 3.0 (cheaper):** `higgsfield generate create seedance_2_0 --start-image <start_id> --end-image <end_id> --duration 5 --aspect_ratio <ar> --wait` (swap `kling3_0` to save credits). Download into `public/scroll-source.mp4`.
+- **Higgs Field MCP (recommended):** `higgsfield_generate_video` with a **first-last-frame** model (Kling FLF — cheaper, or Seedance — best), passing the two keyframes; call `higgsfield_check_cost` first, generate sequentially. Download the clip into `public/scroll-source.mp4`. **CLI fallback:** `higgsfield generate create <flf-video-model> --start-image <start_id> --end-image <end_id> --duration 5 --aspect_ratio <ar> --wait`. See `references/higgsfield.md`.
 - **Credit discipline — the video step is the only real cost:** lock both stills cheaply first, then spend video credits once. Confirm the Higgs balance before this step.
 - If image-to-video is unavailable / unauthenticated → **fall back to a static keyed-image hero** (the start frame) and stop; the layout never breaks.
 

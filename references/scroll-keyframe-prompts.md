@@ -24,6 +24,11 @@
 
 ## Higgs Field commands (the user's setup)
 
+> **Preferred path is the Higgs Field MCP** (`higgsfield_generate_image` for the stills,
+> `higgsfield_generate_video` with a first-last-frame model for the transition) — keyless and
+> account-authed; see `references/higgsfield.md`. The CLI below is the **fallback** when the MCP
+> isn't connected.
+>
 > **Verify before relying on these.** The model IDs and flags below are representative — run
 > `higgsfield generate create --help` (or use the `higgsfield-generate` skill) to confirm the
 > current model names, flags, and output/download semantics first.
