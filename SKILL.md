@@ -15,7 +15,7 @@ Trigger on any request to build, generate, or scaffold a website, web app, landi
 
 Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → sample prompts from the library **(brief biases the categories; live 21st.dev via the Magic MCP when configured — see section below)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(Higgsfield-generated when its MCP is connected, else keyed image API — both queried from the brief's style descriptor, downloaded into `public/`; Tier 4-5 may add opt-in Higgsfield scroll video)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → **deploy & demo assets (Step 7: Vercel deploy — noindex on demos — full-page + phone screenshots and a scrolling GIF into `demo-assets/`, Lighthouse on full-pipeline runs)** → report what was used.
 
-Follow the steps below in order. **Do not write any files until Step 4.** The **Quality Trio** call (see "Design quality" section below) happens between Step 3 and Step 4 and is required, not optional. The **polish pass** (Step 6) runs after Step 5 and is also required — the scaffold is not "done" until critique returns clean. **Step 7 (deploy & demo assets)** then closes every run: the run report's last lines are always the live URL and the demo-asset paths.
+Follow the steps below in order. **Do not write any files until Step 4** (sole exception: the Step 1.5 niche-brief cache write, which touches this skill's own `briefs/` folder, never the project). The **Quality Trio** call (see "Design quality" section below) happens between Step 3 and Step 4 and is required, not optional. The **polish pass** (Step 6) runs after Step 5 and is also required — the scaffold is not "done" until critique returns clean. **Step 7 (deploy & demo assets)** then closes every run: the run report's last lines are always the live URL and the demo-asset paths.
 
 **Demo Mode** — a fast path for outreach volume, triggered by "demo mode", `--demo`, or a `lead.json` — trades research and polish depth for speed (see its section below). It is **additive**: the full pipeline above stays the default.
 
@@ -108,6 +108,8 @@ The shared lead record used by both the AgenticOS export and this skill's intake
 }
 ```
 
+All fields are required; only the ones marked `| null` are nullable, and `googlePhotos` may be empty (`[]`). Treat anything else as a malformed record — say so and skip that lead rather than guessing.
+
 When a `lead.json` is provided, **do not ask the Step 1 questions** — the record answers both. Derive everything from it:
 
 | Field(s) | Drives |
@@ -121,7 +123,7 @@ When a `lead.json` is provided, **do not ask the Step 1 questions** — the reco
 | `bookingLink` | primary CTA href; when `null`, the CTA is `tel:` the phone number |
 | `ownerName` | **not rendered on the site** — echo it in the run report for outreach personalization |
 | `websiteUrl` · `websiteScore` | context only. If a live old site exists, one quick fetch may harvest real copy (hours, menu items, service names) — time-box it to ~1 minute |
-| `leadId` | project folder `generated-site-<business-slug>-<leadId>/` + echoed in the run report so assets match back to the lead |
+| `leadId` | project folder `generated-site-<business-slug>-<leadId>/` + echoed in the run report so assets match back to the lead. **Slugify both parts to `[a-z0-9-]` before building the path** — treat `leadId` as untrusted input, never splice it raw into a filesystem path |
 
 ### Speed trades (explicit — this is the whole mode)
 
@@ -150,7 +152,7 @@ Step 1.5 research is per-*niche*, not per-lead — so cache it. `briefs/` in thi
 A batch of leads = **one site per business**, looped through Demo Mode. This is *not* the multi-site mandate — that governs 3+ designs for the *same* business, and still applies at full strength if a single lead asks for options. Two batch rules:
 
 - Same-niche leads share a cached brief, so **vary the surface per lead** — different `--accent`, different section order, their own `googlePhotos`, and fresh copy. Two competing salons must never receive the same demo.
-- Report per lead: `leadId` · live URL · demo-asset paths (the Step 7 report lines), so AgenticOS can match assets back to leads.
+- Report per lead: `leadId` · live URL · demo-asset paths (the Step 7 report lines) — **one block per lead as it finishes, then end the batch run with a summary table (leadId · URL · GIF path) as the report's final lines**, so AgenticOS can match assets back to leads.
 
 ---
 
@@ -211,7 +213,7 @@ Before picking a tier, **study how the best sites in this niche LOOK** and disti
 - **Anti-references** — generic AI-slop traits to steer away from for this niche
 - **Reference brands + galleries used**
 
-**Cache the brief.** After emitting `NICHE-BRIEF.md`, also write a **niche-level copy** to `briefs/<niche-slug>.md` in this skill folder (conventions only — strip anything project- or client-specific; the repo is public). An existing cached brief is a research head start on full-pipeline runs — skim it before searching — but only **Demo Mode** treats a cache hit as a substitute for this step (see its section above).
+**Cache the brief.** After emitting `NICHE-BRIEF.md`, also write a **niche-level copy** to `briefs/<niche-slug>.md` in this skill folder. **Before writing, verify the copy contains no business name, person, or lead-specific URL/detail — niche nouns and conventions only** (the repo is public; a leaked client detail here is a real breach, not a style problem). An existing cached brief is a research head start on full-pipeline runs — skim it before searching — but only **Demo Mode** treats a cache hit as a substitute for this step (see its section above).
 
 **How the brief feeds the rest of the pipeline:**
 
@@ -380,7 +382,7 @@ See the "Design quality" section below for the full call signatures and when to 
 
 ## Step 7 — Deploy & demo assets (required; the run report ends here)
 
-The pipeline doesn't end at "the code is written" — it ends at **a live URL and outreach-ready visuals**. Once the Step 6 polish pass returns clean, deploy the site and capture its demo assets. Nothing in this step may hard-fail the run: every stage has a fallback, and a skipped stage becomes a run-report line, not a stopped run (same contract as the Step 5 image chain). **The exact deploy commands, noindex snippets, capture script, and ffmpeg recipes live in `references/deploy-demo-assets.md` — read it when this step starts.**
+The pipeline doesn't end at "the code is written" — it ends at **a live URL and outreach-ready visuals**. Once Step 6 is complete for the current mode (full pipeline: critique returns clean; Demo Mode: the single critique + polish pass is done), deploy the site and capture its demo assets. Nothing in this step may hard-fail the run: every stage has a fallback, and a skipped stage becomes a run-report line, not a stopped run (same contract as the Step 5 image chain). **The exact deploy commands, noindex snippets, capture script, and ffmpeg recipes live in `references/deploy-demo-assets.md` — read it when this step starts.**
 
 **First, classify the deploy** — it changes what ships:
 
@@ -408,17 +410,17 @@ Client builds skip all of this (and keep the `Sitemap:` line).
 
 First match wins; **capture the resulting URL** either way:
 
-1. **Vercel CLI (preferred).** Check `vercel --version`. From the project folder: `vercel deploy --yes` (preview URL — right for demos) or `vercel --prod --yes` (client builds that are go-for-launch). `--yes` keeps it non-interactive; auth is a one-time `vercel login` (or `--token "$VERCEL_TOKEN"` for headless runs — see this skill's `.env.example`). The deployment URL prints on stdout — capture it.
+1. **Vercel CLI (preferred).** Check `vercel --version`. From the project folder: `vercel deploy --yes` (preview URL — right for demos) or `vercel --prod --yes` (client builds that are go-for-launch). `--yes` keeps it non-interactive; auth is a one-time `vercel login` (or, for headless runs, `--token "$VERCEL_TOKEN"` in a POSIX shell / `--token $env:VERCEL_TOKEN` in PowerShell — see this skill's `.env.example`). The deployment URL prints on stdout — capture it.
 2. **Vercel MCP (fallback).** If the CLI is missing but the tools surface (`mcp__<server>__deploy_to_vercel` or similar), deploy through the tool and capture the URL from its result.
-3. **Neither → don't block.** Run `npm run preview` (default `http://localhost:4173`), capture the 7.5 assets against it, and note in the run report that deploy was skipped and why.
+3. **Neither → don't block.** Start `npm run preview` **in the background** (it's a long-running server — don't wait on it; read the actual URL/port from its output, default `http://localhost:4173`), capture the 7.5 assets against it, then stop it. Note in the run report that deploy was skipped and why.
 
 ### 7.4 — Lighthouse (full pipeline only)
 
-**Skip in Demo Mode** (speed). Otherwise run it against the live URL (or the local preview):
+**Skip in Demo Mode** (speed). Otherwise run it against the live URL (or the local preview) — best-effort, like every stage here:
 
-`npx lighthouse <url> --output=json --output-path=demo-assets/lighthouse.json --quiet --chrome-flags="--headless=new"`
+`npx --yes lighthouse <url> --output=json --output-path=demo-assets/lighthouse.json --quiet --chrome-flags="--headless=new"`
 
-Put the four category scores (Performance / Accessibility / Best Practices / SEO) in the run report. Below 90 on Accessibility or SEO is worth one fix pass before delivering a client build.
+Put the four category scores (Performance / Accessibility / Best Practices / SEO) in the run report. Below 90 on Accessibility or SEO is worth one fix pass **on client builds**. On a full-pipeline **demo** deploy, the SEO audit will flag "page is blocked from indexing" — that's the 7.2 noindex working as intended: report the score with that note and **never remove the noindex to chase it**.
 
 ### 7.5 — Demo assets (`demo-assets/`)
 
@@ -442,7 +444,7 @@ Screenshots: demo-assets/desktop-full.png · demo-assets/phone-390.png
 Scroll GIF:  demo-assets/scroll-demo.gif
 ```
 
-Demo Mode prepends the `leadId` to this block so AgenticOS can match assets back to the lead.
+Demo Mode prepends the `leadId` to this block so AgenticOS can match assets back to the lead. **Batch Demo Mode:** emit one block per lead as it finishes, then close the whole report with the batch summary table (leadId · URL · GIF path) as the true final lines.
 
 ## Motion & interactive components (Tier 3-5)
 
@@ -574,7 +576,7 @@ One scroll-scrub hero per site; never stack it with other heavy animated backgro
 
 ## Design quality — call companion skills
 
-This skill chooses *what* to build; the companion skills below make it look good. The **Quality Trio** (`impeccable` + `ui-ux-pro-max` + `design-taste-frontend`) is **required** on every generation, and the **polish pass** (`impeccable critique` + `polish`, plus `emil-design-eng` on Tier 3+) is **required** before reporting the site as done. Everything else is situational.
+This skill chooses *what* to build; the companion skills below make it look good. The **Quality Trio** (`impeccable` + `ui-ux-pro-max` + `design-taste-frontend`) is **required** on every generation, and the **polish pass** (`impeccable critique` + `polish`, plus `emil-design-eng` on Tier 3+) is **required** before reporting the site as done. Everything else is situational. (**Demo Mode** relaxes the enforcement, not the intent: the trio still runs but best-effort with silent fallback, and the polish pass is a single critique + polish — see the Demo Mode section.)
 
 ### Required: the Quality Trio (Step 3.5, before writing any files)
 

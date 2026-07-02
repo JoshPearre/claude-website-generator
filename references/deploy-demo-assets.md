@@ -47,10 +47,10 @@ First match wins. **Always capture the resulting URL** — the run report ends w
 1. **Vercel CLI (preferred).** `vercel --version` to check it exists (`npm i -g vercel` if the user wants it — **ask before installing**, same rule as ffmpeg). From the **project folder**:
    - Demo deploys: `vercel deploy --yes` → a preview URL (`https://<project>-<hash>-<scope>.vercel.app`). Exactly right for outreach.
    - Client builds, go-for-launch: `vercel --prod --yes`.
-   - `--yes` accepts project defaults non-interactively. Auth is a one-time `vercel login` (browser); for headless/CI runs pass `--token "$VERCEL_TOKEN"` (see the skill's `.env.example` — generation-time only, never written into the project).
+   - `--yes` accepts project defaults non-interactively. Auth is a one-time `vercel login` (browser); for headless/CI runs pass the token per shell — POSIX: `--token "$VERCEL_TOKEN"` · PowerShell: `--token $env:VERCEL_TOKEN` (see the skill's `.env.example` — generation-time only, never written into the project).
    - The deployment URL prints on stdout (last line) — capture it.
 2. **Vercel MCP (fallback).** If the CLI is absent but the tools surface (`mcp__<server>__deploy_to_vercel` or similar), deploy through the tool and capture the URL from its result. `get_deployment` / `get_deployment_build_logs` debug a failed build.
-3. **Local preview (never-fail floor).** `npm run preview` → `http://localhost:4173`. Capture the Section 3–5 assets against it and note in the run report: deploy skipped + why (no CLI, no MCP, or auth declined).
+3. **Local preview (never-fail floor).** Start `npm run preview` **in the background** — it's a long-running server, so never wait on it in the foreground; read the actual URL/port from its startup output (default `http://localhost:4173`, but Vite bumps the port if it's taken). Capture the Section 3–5 assets against it, stop the server, and note in the run report: deploy skipped + why (no CLI, no MCP, or auth declined).
 
 ## 3. Screenshots — Playwright MCP path (preferred)
 
