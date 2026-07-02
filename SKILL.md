@@ -1,6 +1,6 @@
 ---
 name: website-generator
-description: Generate a complete multi-file website project scaffold by composing UI prompts from a curated, design-intensity-tiered prompt library. Use this skill whenever the user wants to build, generate, scaffold, redesign, or create a website, web app, landing page, or marketing site — including phrases like "build me a website", "generate a site", "create a landing page", "make a site for my [business/niche]", or any request to produce a website for a specific niche or audience. The skill matches design intensity (minimal utility to experimental/maximalist) to the site's purpose and produces a real Vite + React project folder. Also use this skill whenever the user wants to create 3D / scroll-driven / Apple-style scroll animations — scroll-scrubbed product or video heroes (e.g. "create 3D scroll animations", "scroll animation", "scrollytelling hero", or "turn this MP4/product into a scroll-driven frame animation").
+description: Generate a complete multi-file website project scaffold by composing UI prompts from a curated, design-intensity-tiered prompt library. Use this skill whenever the user wants to build, generate, scaffold, redesign, or create a website, web app, landing page, or marketing site — including phrases like "build me a website", "generate a site", "create a landing page", "make a site for my [business/niche]", or any request to produce a website for a specific niche or audience. The skill matches design intensity (minimal utility to experimental/maximalist) to the site's purpose and produces a real Vite + React project folder. Also use this skill whenever the user wants to create 3D / scroll-driven / Apple-style scroll animations — scroll-scrubbed product or video heroes (e.g. "create 3D scroll animations", "scroll animation", "scrollytelling hero", or "turn this MP4/product into a scroll-driven frame animation"). Also trigger **Demo Mode** — the fast outreach path — when the user says "demo mode", passes `--demo`, or hands you a `lead.json` lead record (e.g. an AgenticOS export): intake questions are skipped and the skill builds + deploys a noindexed demo site for that business.
 ---
 
 # Website Generator
@@ -13,9 +13,11 @@ Trigger on any request to build, generate, or scaffold a website, web app, landi
 
 ## Workflow overview
 
-Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → sample prompts from the library **(brief biases the categories; live 21st.dev via the Magic MCP when configured — see section below)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(Higgsfield-generated when its MCP is connected, else keyed image API — both queried from the brief's style descriptor, downloaded into `public/`; Tier 4-5 may add opt-in Higgsfield scroll video)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → report what was used.
+Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → sample prompts from the library **(brief biases the categories; live 21st.dev via the Magic MCP when configured — see section below)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(Higgsfield-generated when its MCP is connected, else keyed image API — both queried from the brief's style descriptor, downloaded into `public/`; Tier 4-5 may add opt-in Higgsfield scroll video)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → **deploy & demo assets (Step 7: Vercel deploy — noindex on demos — full-page + phone screenshots and a scrolling GIF into `demo-assets/`, Lighthouse on full-pipeline runs)** → report what was used.
 
-Follow the steps below in order. **Do not write any files until Step 4.** The **Quality Trio** call (see "Design quality" section below) happens between Step 3 and Step 4 and is required, not optional. The **polish pass** (Step 6) runs after Step 5 and is also required — the scaffold is not "done" until critique returns clean.
+Follow the steps below in order. **Do not write any files until Step 4.** The **Quality Trio** call (see "Design quality" section below) happens between Step 3 and Step 4 and is required, not optional. The **polish pass** (Step 6) runs after Step 5 and is also required — the scaffold is not "done" until critique returns clean. **Step 7 (deploy & demo assets)** then closes every run: the run report's last lines are always the live URL and the demo-asset paths.
+
+**Demo Mode** — a fast path for outreach volume, triggered by "demo mode", `--demo`, or a `lead.json` — trades research and polish depth for speed (see its section below). It is **additive**: the full pipeline above stays the default.
 
 ---
 
@@ -40,7 +42,7 @@ This skill ships a **frozen snapshot** of 21st.dev (28 hand-harvested prompts in
 
 **Trigger:** the user asks for **three or more** websites, designs, variations, options, versions, concepts, or mockups in a single request ("make me 3 sites", "give me 5 designs", "a few different versions", "some options for my restaurant").
 
-When triggered you are **not** generating one site with variants — you run the **full pipeline (Steps 1–6) independently, once per site**, under one hard rule:
+When triggered you are **not** generating one site with variants — you run the **full pipeline (Steps 1–7) independently, once per site**, under one hard rule:
 
 > **Every site in the set must be completely different from every other site in the set — on every axis below. Nothing is shared, reused, or reskinned across siblings.**
 
@@ -58,7 +60,7 @@ Differentiate each site on **all** of these, never a subset:
 
 **Niche brief in multi-site mode:** when the batch shares one niche, derive the Niche Design Brief (Step 1.5) once, then give **each sibling a different design interpretation of it** — different reference exemplars, palette/accent, type character, motion character, and image-API queries. The brief informs imagery, motion, and reference vocabulary only; it does **not** lock the batch to one look — each sibling still **rolls its own random tier (1–5) and binds a different, unused design direction** per the rules above (those override the brief's single Tier and Design-direction fields).
 
-**Mechanism:** loop the pipeline per site. For each site, independently (1) roll tier 1–5, (2) pick an **unused** design direction / palette / font / style, (3) sample a **non-overlapping** prompt set, (4) source a fresh image set with its own image count, (5) write fresh copy, (6) scaffold into its **own** project folder (`generated-site-<slug>-<n>/`), (7) run the Step 6 polish pass — then build the next site from scratch.
+**Mechanism:** loop the pipeline per site. For each site, independently (1) roll tier 1–5, (2) pick an **unused** design direction / palette / font / style, (3) sample a **non-overlapping** prompt set, (4) source a fresh image set with its own image count, (5) write fresh copy, (6) scaffold into its **own** project folder (`generated-site-<slug>-<n>/`), (7) run the Step 6 polish pass, (8) run the Step 7 deploy + demo-asset capture (each site gets its own URL and `demo-assets/`) — then build the next site from scratch.
 
 ### Red flags — you are violating the mandate if you think:
 
@@ -78,7 +80,83 @@ structure · palette / fonts / style · every component · layout positions · i
 
 ---
 
+## Demo Mode — fast path for outreach volume (opt-in)
+
+**Triggers:** the user says **"demo mode"**, passes **`--demo`**, or hands you a **`lead.json`** (a record, a file path, or a batch of them). The full pipeline stays the default — Demo Mode is a deliberate speed trade for **speculative outreach**: build a stranger's business a demo site they haven't asked for yet. **Target: under 15 minutes per demo, batchable.** Everything not explicitly traded below runs exactly as the numbered steps describe.
+
+### Intake — the `lead.json` contract (replaces Step 1)
+
+The shared lead record used by both the AgenticOS export and this skill's intake:
+
+```json
+{
+  "leadId": "string",
+  "businessName": "string",
+  "niche": "string",
+  "city": "string",
+  "state": "string",
+  "address": "string",
+  "phone": "string",
+  "websiteUrl": "string | null",
+  "websiteScore": "number | null",
+  "rating": "number",
+  "reviewCount": "number",
+  "ownerName": "string | null",
+  "googlePhotos": ["url", "..."],
+  "businessSummary": "string",
+  "bookingLink": "string | null"
+}
+```
+
+When a `lead.json` is provided, **do not ask the Step 1 questions** — the record answers both. Derive everything from it:
+
+| Field(s) | Drives |
+|---|---|
+| `niche` | tier-map + niche-brief cache lookup (below) |
+| `businessName` · `city` · `state` | site title, a **headline that references their town** ("(City)'s …"), footer, JSON-LD |
+| `address` · `phone` | **real NAP** everywhere — footer, contact section, `LocalBusiness` JSON-LD (Step 4 baseline). Hours only if `businessSummary` supplies them; otherwise `[PLACEHOLDER — client to replace]` |
+| `googlePhotos` | **top of the Step 5 image chain** — download the business's own photos into `public/` before generating or stock-searching anything (real photos of the actual business beat stock every time) |
+| `businessSummary` | copy seed for hero/about — rewrite in the brief's voice, don't paste |
+| `rating` · `reviewCount` | trust strip ("4.8 ★ · 212 Google reviews") — supplied facts, so rendering them verbatim is allowed |
+| `bookingLink` | primary CTA href; when `null`, the CTA is `tel:` the phone number |
+| `ownerName` | **not rendered on the site** — echo it in the run report for outreach personalization |
+| `websiteUrl` · `websiteScore` | context only. If a live old site exists, one quick fetch may harvest real copy (hours, menu items, service names) — time-box it to ~1 minute |
+| `leadId` | project folder `generated-site-<business-slug>-<leadId>/` + echoed in the run report so assets match back to the lead |
+
+### Speed trades (explicit — this is the whole mode)
+
+| Full pipeline | Demo Mode |
+|---|---|
+| Step 1 — two intake questions | **skipped** — `lead.json` supplies everything |
+| Step 1.5 — visual research (~10 min) | **cached Niche Design Brief** from `briefs/<niche-slug>.md` when one exists; on a miss, research once (time-boxed as written) and **write the brief to the cache** so the next lead in that niche is free |
+| Step 2 — tier deliberation + shift window | **fixed at Tier 3 — Modern Consumer**, overriding the map/brief default. Still print the transparency line; don't wait for a reply |
+| `higgs_hero` / 3D scroll-video hero | **always OFF** — standard hero from the brief's archetype. (An explicit user request for a scroll-scrub hero still wins — user overrides always win — but then accept the time cost) |
+| Step 3.5 — Quality Trio (required) | still runs, but **best-effort with silent fallback**: a missing or failing companion skill never blocks — bind the design direction's defaults, continue, and note it in the run report (mirror the Step 5 image chain's never-hard-fail pattern) |
+| Step 6 — loop-until-clean + `emil-design-eng` | **one `critique` + one `polish` pass**, no loop; skip `emil-design-eng` and the `refiner` |
+| Step 7 — Lighthouse | **skipped** for speed |
+| Step 7 — deploy | runs — **always as a demo deploy (noindex)**, never `--prod` |
+
+### Niche-brief cache (`briefs/`)
+
+Step 1.5 research is per-*niche*, not per-lead — so cache it. `briefs/` in this skill folder holds one brief per niche slug (`briefs/restaurant.md`, `briefs/salon.md`, …), pre-seeded for the five highest-volume outreach niches: **restaurant, salon, contractor, dentist, gym**. See `briefs/_index.md` for the slug rules.
+
+- **Cache hit** → read the brief, skip Step 1.5 research entirely.
+- **Cache miss** → run Step 1.5 once, then **write the resulting brief to `briefs/<niche-slug>.md`**.
+- Cached briefs are **niche-level design conventions only — never write lead/client data into one** (this skill repo is public).
+- The full pipeline also writes to this cache after every Step 1.5 pass and may read an existing brief as a head start — but only Demo Mode treats the cache as a *substitute* for the research.
+
+### Batching
+
+A batch of leads = **one site per business**, looped through Demo Mode. This is *not* the multi-site mandate — that governs 3+ designs for the *same* business, and still applies at full strength if a single lead asks for options. Two batch rules:
+
+- Same-niche leads share a cached brief, so **vary the surface per lead** — different `--accent`, different section order, their own `googlePhotos`, and fresh copy. Two competing salons must never receive the same demo.
+- Report per lead: `leadId` · live URL · demo-asset paths (the Step 7 report lines), so AgenticOS can match assets back to leads.
+
+---
+
 ## Step 1 — Intake
+
+**Demo Mode: skip this step.** When a `lead.json` is in hand, the record answers both questions (see "Demo Mode" above) — do not ask them.
 
 Ask the user exactly two questions and wait for both answers:
 
@@ -133,6 +211,8 @@ Before picking a tier, **study how the best sites in this niche LOOK** and disti
 - **Anti-references** — generic AI-slop traits to steer away from for this niche
 - **Reference brands + galleries used**
 
+**Cache the brief.** After emitting `NICHE-BRIEF.md`, also write a **niche-level copy** to `briefs/<niche-slug>.md` in this skill folder (conventions only — strip anything project- or client-specific; the repo is public). An existing cached brief is a research head start on full-pipeline runs — skim it before searching — but only **Demo Mode** treats a cache hit as a substitute for this step (see its section above).
+
 **How the brief feeds the rest of the pipeline:**
 
 - **Step 2 (tier):** the brief's density/expressiveness confirms or nudges the `tier-niche-map` default.
@@ -182,11 +262,11 @@ The tier system is the core of this skill. There are five tiers:
 
 > Niche: [niche]. Selected design tier: [N] — [tier name]. Say "tone it down" or "go wild" to shift tiers.
 
-If the user replies with a shift command, move one tier down ("tone it down") or up ("go wild") and **resample (Step 3) at the new tier** before creating any files.
+If the user replies with a shift command, move one tier down ("tone it down") or up ("go wild") and **resample (Step 3) at the new tier** before creating any files. **Demo Mode:** the tier is fixed at 3 and the line is informational — print it and keep moving (see the Demo Mode section).
 
 **If the user has not named a brand or given a reference URL**, also auto-select a **design direction** here — the aesthetic anchor that supplies palette + fonts (see `directions/design-directions.md` for the soft niche/tier → direction map) — and name it in the same line, e.g. *"Direction: Modern minimal — name a brand or pick another direction to change the look."* The direction is bound to `:root` in Step 3.5; naming it now lets the user redirect early.
 
-**Also decide the `higgs_hero` toggle here** (the Higgs Field scroll-interactive video hero — see its dedicated section below). Default it from tier + niche: **ON** for Tier 5 or visually-driven niches (restaurant, hospitality, real estate, automotive, fashion/beauty, fitness, events, agency, portfolio, product launch); **OFF** for Tier 1–3 and text/utility niches (dashboards, SaaS consoles, law/medical/finance intake, B2B docs, info sites). State it in the same transparency line and let the user flip it — *"Hero: Higgs scroll-video ON (recommended) — say 'simple hero' to turn it off."* "go wild" / "maximum" / "most interactive" / "make it cinematic" forces it ON; "tone it down" / "keep it simple" / "make it fast" forces it OFF.
+**Also decide the `higgs_hero` toggle here** (the Higgs Field scroll-interactive video hero — see its dedicated section below). Default it from tier + niche: **ON** for Tier 5 or visually-driven niches (restaurant, hospitality, real estate, automotive, fashion/beauty, fitness, events, agency, portfolio, product launch); **OFF** for Tier 1–3 and text/utility niches (dashboards, SaaS consoles, law/medical/finance intake, B2B docs, info sites). State it in the same transparency line and let the user flip it — *"Hero: Higgs scroll-video ON (recommended) — say 'simple hero' to turn it off."* "go wild" / "maximum" / "most interactive" / "make it cinematic" forces it ON; "tone it down" / "keep it simple" / "make it fast" forces it OFF. **Demo Mode forces it OFF** (an explicit user request for a scroll-scrub hero still wins).
 
 ## Step 3 — Sample prompts from the library
 
@@ -228,7 +308,7 @@ generated-site-<timestamp>/
 ├── package.json
 ├── vite.config.js
 ├── tailwind.config.js
-├── index.html
+├── index.html          # per-page meta/OG + LocalBusiness JSON-LD (local-SEO baseline below)
 ├── .gitignore          # .env, node_modules/, dist/
 ├── .env.example        # only if the site needs runtime keys
 ├── src/
@@ -237,16 +317,32 @@ generated-site-<timestamp>/
 │   ├── components/     # one component per sampled prompt
 │   └── styles/
 ├── public/             # generated images land here
+│   ├── robots.txt      # local-SEO baseline
+│   └── sitemap.xml     # local-SEO baseline
+├── demo-assets/        # Step 7 screenshots + scroll GIF (created at deploy time)
 └── README.md           # tier, niche, sampled prompts + sources
 ```
 
+(Demo Mode names the folder `generated-site-<business-slug>-<leadId>/` so assets trace back to the lead.)
+
 Before writing files, confirm there is a `.gitignore` and that `.env` is listed in it. Never hardcode secrets — if the site needs a key, put a blank entry in `.env.example` and reference it via `import.meta.env`. **This runtime-key pattern (`import.meta.env` / `VITE_`) is only for keys the deployed site genuinely needs at runtime — the Step 5 image-API key is *not* one of them: it is generation-time only and must never be exposed via `import.meta.env` or a `VITE_`/`NEXT_PUBLIC_` prefix.**
+
+**Local-SEO baseline (both modes — required whenever the site represents a real-world business).** Bake these into the scaffold. Demo Mode populates them from the `lead.json` record; the full pipeline uses whatever real facts the user supplied and marks the rest `[PLACEHOLDER — client to replace]` (never invent facts — same rule as Step 1.5):
+
+- **`LocalBusiness` JSON-LD** — a `<script type="application/ld+json">` block in `index.html`: `name`, `address` (as `PostalAddress`), `telephone`, `url`, plus `aggregateRating` (from `rating`/`reviewCount`) and `image` when the lead record supplies them. Use the closest schema.org subtype when obvious (`Restaurant`, `HairSalon`, `Dentist`, `GeneralContractor`, `ExerciseGym`).
+- **NAP consistency** — the business **N**ame, **A**ddress, and **P**hone must be the *same exact strings* everywhere they appear: footer, contact section, and the JSON-LD. Define them once (e.g. `src/data/business.js`) and import — never re-type them.
+- **Per-page meta/OG** — `<title>`, `meta description`, `og:title` / `og:description` / `og:image` (the hero asset), and a canonical-URL slot per page/route.
+- **`public/sitemap.xml` + `public/robots.txt`** — sitemap listing every route; robots.txt allowing crawls, with a `Sitemap:` line. (Step 7 adjusts these for **demo** deploys: noindex meta + header added, `Sitemap:` line dropped.)
+
+Non-business sites (portfolios, art projects, docs) keep the per-page meta/OG + sitemap + robots.txt but skip the `LocalBusiness` block.
 
 At the top of `src/App.jsx`, include a comment block logging the chosen tier, the niche, and every sampled prompt (title + source + URL). The generated `README.md` repeats this so the user can trace every design decision.
 
 ## Step 5 — Image assets (keyed image API first, then Neurascapes → Canva → placeholder)
 
 Sites need images — hero visuals, section photos, atmospheric backgrounds, og:image. Source them through a fallback chain, top to bottom; the first tier that yields a usable image for a slot wins. **Reuse the single style descriptor from the Niche Design Brief (Step 1.5) for every image** so the whole set reads cohesive.
+
+**Demo Mode:** the lead's `googlePhotos` sit **above every source in this chain** — download the business's own photos into `public/` first, then fill only the remaining slots via the chain below (real photos of the actual business beat generated or stock every time).
 
 1. **List the image slots** the site needs and confirm the brief's style descriptor (subject · lighting · mood · composition · photo/illustration/3D) + one palette/temperature anchor. Build each query from the brief's **image query seeds** plus that locked style + mood lexicon — only the subject slot varies per slot. Pass geometry as the API `orientation` param (hero → `landscape`, card/avatar → `square` [Unsplash: `squarish`], sidebar → `portrait`), not in the text. Track chosen image ids in a `Set` to de-dupe.
 
@@ -275,12 +371,78 @@ Once Step 5 finishes, the scaffold is "compiled" but not yet "designed". Run the
 
 1. `Skill(skill="impeccable", args="critique")` — flags anti-patterns in the just-written code (generic gradients, cards-on-cards, lorem still in place, weak hierarchy, missing contrast).
 2. `Skill(skill="impeccable", args="polish")` — applies the fixes critique surfaced.
-3. Loop 1–2 until critique returns clean.
-4. **Tier 3+ only:** `Skill(skill="emil-design-eng")` — consult on motion, hover/focus states, and transition timing for the hero, primary CTA, nav, and key cards. Skip on Tier 1-2 sites where motion is minimal.
+3. Loop 1–2 until critique returns clean. (**Demo Mode:** one `critique` + one `polish` pass, no loop — see its section.)
+4. **Tier 3+ only:** `Skill(skill="emil-design-eng")` — consult on motion, hover/focus states, and transition timing for the hero, primary CTA, nav, and key cards. Skip on Tier 1-2 sites where motion is minimal, and in Demo Mode.
 5. **When the Magic MCP is configured (optional):** pass the few components most worth getting right (hero / primary CTA / key cards) through `21st_magic_component_refiner` for a 21st.dev-grade redesign, then **re-run step 1 (`impeccable critique`)** so the refined output still clears the anti-pattern gate and stays bound to the locked tokens. Refine the standouts — don't re-skin the whole site. See `references/21st-dev-mcp.md`.
 6. **Production-bound only:** `Skill(skill="impeccable", args="audit")` — final 29-rule deterministic anti-pattern scan, JSON output suitable for a CI gate.
 
 See the "Design quality" section below for the full call signatures and when to deviate.
+
+## Step 7 — Deploy & demo assets (required; the run report ends here)
+
+The pipeline doesn't end at "the code is written" — it ends at **a live URL and outreach-ready visuals**. Once the Step 6 polish pass returns clean, deploy the site and capture its demo assets. Nothing in this step may hard-fail the run: every stage has a fallback, and a skipped stage becomes a run-report line, not a stopped run (same contract as the Step 5 image chain). **The exact deploy commands, noindex snippets, capture script, and ffmpeg recipes live in `references/deploy-demo-assets.md` — read it when this step starts.**
+
+**First, classify the deploy** — it changes what ships:
+
+- **Demo deploy** (speculative outreach — Demo Mode always, or the user says it's a pitch/demo): **must carry noindex**, so a stranger's business never gets indexed under your URL.
+- **Client build** (the user owns the business / asked for their real site): **skips noindex**; goes to production only when they say so.
+
+If a full-pipeline run is ambiguous, ask one question: *"Is this a demo for outreach, or the client's real site?"*
+
+### 7.1 — Build check
+
+`npm run build` in the project folder. Fix anything that breaks the production build before deploying — a demo that 404s is worse than no demo.
+
+### 7.2 — Demo deploys only: noindex + optional gate
+
+Before deploying a **demo**:
+
+1. Add to `index.html` `<head>`: `<meta name="robots" content="noindex, nofollow" />`.
+2. Write `vercel.json` at the project root so an `X-Robots-Tag: noindex, nofollow` header covers every route (exact block in the reference file).
+3. **Leave `public/robots.txt` allowing crawls** (the Step 4 baseline) — a `Disallow: /` would stop crawlers from ever *seeing* the noindex; the meta + header are the mechanism. Just drop the `Sitemap:` line.
+4. **Optional password gate** — Vercel's Deployment Protection (dashboard toggle, plan-dependent) or a tiny client-side gate component for soft privacy. Off by default: a demo the prospect can't open converts nobody. Mention the option in the run report when the lead's market is sensitive.
+
+Client builds skip all of this (and keep the `Sitemap:` line).
+
+### 7.3 — Deploy (Vercel CLI → Vercel MCP → local preview)
+
+First match wins; **capture the resulting URL** either way:
+
+1. **Vercel CLI (preferred).** Check `vercel --version`. From the project folder: `vercel deploy --yes` (preview URL — right for demos) or `vercel --prod --yes` (client builds that are go-for-launch). `--yes` keeps it non-interactive; auth is a one-time `vercel login` (or `--token "$VERCEL_TOKEN"` for headless runs — see this skill's `.env.example`). The deployment URL prints on stdout — capture it.
+2. **Vercel MCP (fallback).** If the CLI is missing but the tools surface (`mcp__<server>__deploy_to_vercel` or similar), deploy through the tool and capture the URL from its result.
+3. **Neither → don't block.** Run `npm run preview` (default `http://localhost:4173`), capture the 7.5 assets against it, and note in the run report that deploy was skipped and why.
+
+### 7.4 — Lighthouse (full pipeline only)
+
+**Skip in Demo Mode** (speed). Otherwise run it against the live URL (or the local preview):
+
+`npx lighthouse <url> --output=json --output-path=demo-assets/lighthouse.json --quiet --chrome-flags="--headless=new"`
+
+Put the four category scores (Performance / Accessibility / Best Practices / SEO) in the run report. Below 90 on Accessibility or SEO is worth one fix pass before delivering a client build.
+
+### 7.5 — Demo assets (`demo-assets/`)
+
+Capture into a `demo-assets/` folder inside the generated project — these are what the outreach email embeds. **Playwright MCP browser tools first** (`browser_navigate` / `browser_resize` / `browser_take_screenshot`, plus evaluate for scroll stepping); when they're absent, a **tiny Node Playwright script** captures everything in one run. ffmpeg then assembles the GIF exactly like the 3D scroll mode's flip-book extraction, pointed the other way (page frames → clip instead of clip → frames). Script template, tool sequence, and the size-budget loop: `references/deploy-demo-assets.md`.
+
+Three assets, in order:
+
+1. **`desktop-full.png`** — full-page screenshot at **1440px** wide. Wait ~1s after load so hero entrance motion settles — a half-faded hero ruins every asset downstream.
+2. **`phone-390.png`** — **390×844** viewport shot of the hero (the phone-frame view; a full-page mobile capture is optional).
+3. **`scroll-demo.gif`** — a **3–4s scrolling tour**: ~30 viewport frames stepped top→bottom at 1440px, assembled at 8–10fps. Two hard rules:
+   - **Frame 1 is the hero money-shot** — scroll position 0, entrance animations finished. Outlook (and several other email clients) render **only the first frame** of a GIF, so frame 1 must sell the site on its own.
+   - **Target under ~200KB** for email embedding — use the ffmpeg two-pass palette trick (`palettegen` → `paletteuse`), then shrink width / fps / palette colors until it fits. Animated WebP is smaller for web embeds, but email clients want GIF.
+
+### 7.6 — Run report
+
+The run report (tier, direction, sampled prompts + sources, fallbacks that fired, Lighthouse scores on full runs) **must end with these lines, always last**:
+
+```
+Live URL:    <deployment URL, or "deploy skipped — <reason>">
+Screenshots: demo-assets/desktop-full.png · demo-assets/phone-390.png
+Scroll GIF:  demo-assets/scroll-demo.gif
+```
+
+Demo Mode prepends the `leadId` to this block so AgenticOS can match assets back to the lead.
 
 ## Motion & interactive components (Tier 3-5)
 
@@ -528,4 +690,8 @@ The design skills this workflow calls (`impeccable`, `design-taste-frontend` + i
 - Reach ~95% confidence before writing files; ask focused follow-ups when unsure.
 - Never hardcode secrets. Use `.env` + `.env.example`, and verify `.gitignore` before creating files.
 - Load only the prompt category files you need — never the whole library.
+- **Demo deploys always ship noindex** (meta + `X-Robots-Tag`) — never let a demo of someone else's business get indexed. Client builds skip it.
+- Deploys default to a **preview** URL; `vercel --prod` only when the user says the site is theirs to ship.
+- `VERCEL_TOKEN` is generation-time only, like the image keys — never write it into the generated project, and never commit it (this repo is public).
+- Cached niche briefs (`briefs/`) hold niche-level design conventions only — never write lead/client data into them.
 - The library grows via the harvest workflow in `harvest/` — see `harvest/HARVEST_GUIDE.md`.

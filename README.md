@@ -2,7 +2,7 @@
 
 A [Claude Code](https://claude.ai/code) skill that generates polished, multi-file Vite + React websites by composing UI prompts from a design-intensity-tiered prompt library.
 
-Tell Claude "build me a website" and it asks two questions (niche + context), picks a design tier (1 minimal → 5 experimental), samples prompts from the library, runs a quality pass, and outputs a real Vite + React + Tailwind + Framer Motion project.
+Tell Claude "build me a website" and it asks two questions (niche + context), picks a design tier (1 minimal → 5 experimental), samples prompts from the library, runs a quality pass, outputs a real Vite + React + Tailwind + Framer Motion project — then deploys it to Vercel and captures outreach-ready demo assets (screenshots + a scrolling GIF).
 
 ---
 
@@ -44,11 +44,11 @@ The tier is auto-selected from `tiers/tier-niche-map.md` based on your niche, or
 
 When no brand or reference is provided, Claude picks a deterministic palette + font + posture from `directions/design-directions.md`:
 
-- **Modern Minimal** — Tier 1–2
-- **Bold Tech** — Tier 3
-- **Warm Editorial** — Tier 2–3
-- **Premium Luxe** — Tier 4
-- **Experimental Data** — Tier 5
+- **Modern minimal** (Linear/Vercel) — Tier 2–3
+- **Tech utility** (Datadog/GitHub) — Tier 1–2
+- **Human approachable** (Airbnb/Duolingo) — Tier 2–4
+- **Editorial** (Monocle/FT) — Tier 3–4
+- **Brutalist experimental** (Are.na/Yale) — Tier 4–5
 
 ### Component registries (4 shadcn registries)
 
@@ -72,6 +72,20 @@ After files exist, it runs a **polish pass**:
 - `impeccable critique` → `impeccable polish` (repeats until clean)
 - `emil-design-eng` for Tier 3+ (motion timing, micro-interactions)
 
+### Deploy & demo assets (Step 7)
+
+Every run ends with a **live URL and outreach-ready visuals**. The skill deploys via the Vercel CLI (`vercel deploy --yes`; Vercel MCP as fallback, local preview as the floor), then captures into `demo-assets/` inside the project:
+
+- a full-page **desktop screenshot** (1440px) and a **phone-frame shot** (390px)
+- a **3–4s scrolling GIF** — first frame is the hero (Outlook shows only frame 1), compressed under ~200KB for email embedding (ffmpeg palette trick)
+- **Lighthouse scores** on full-pipeline runs
+
+**Demo deploys** (speculative outreach) always ship `noindex` (meta + `X-Robots-Tag`); client builds skip it. The run report always ends with the live URL and asset paths. Details: [`references/deploy-demo-assets.md`](references/deploy-demo-assets.md).
+
+### Demo Mode (outreach fast path)
+
+Say **"demo mode"**, pass **`--demo`**, or hand the skill a **`lead.json`** (the shared AgenticOS lead contract: business name, niche, city/state, NAP, Google photos, rating/reviews, booking link) and it skips the intake questions and builds a deployed, noindexed demo for that business in **under 15 minutes — batchable**. The speed trades: cached niche briefs (`briefs/`, seeded for restaurant/salon/contractor/dentist/gym), fixed Tier 3, no 3D scroll hero, single polish pass, best-effort quality skills, no Lighthouse. The full pipeline stays the default — Demo Mode is purely additive.
+
 ---
 
 ## Setup
@@ -89,6 +103,8 @@ After files exist, it runs a **polish pass**:
 | Firecrawl key (harvest) | Copy `.env.example` → `.env`, add key from [firecrawl.dev](https://firecrawl.dev) (free tier available) |
 | Image API (Pexels/Unsplash) | Copy `.env.example` → `.env`, add `PEXELS_API_KEY` ([pexels.com/api](https://www.pexels.com/api/), free) or `UNSPLASH_ACCESS_KEY` — sources niche-tailored photos at generation time |
 | Canva MCP | One-time browser login — generates designed image assets |
+| Vercel CLI (deploy) | `npm i -g vercel` + one-time `vercel login` — Step 7 deploys every finished site and captures its URL. Optional `VERCEL_TOKEN` for headless runs |
+| Playwright MCP (demo assets) | Step 7 screenshots + scrolling GIF; falls back to a tiny Node Playwright script |
 | 21st.dev Magic MCP | **Live** 21st.dev components (search + generate code + logos + refine) — supersedes the frozen 21st.dev snapshot when configured. Key + setup below. |
 | Higgsfield MCP | AI **image + video** generation (Kling/Seedance/Veo/Sora) — primary Step 5 imagery + Tier 4-5 scroll video. Keyless (account/credit auth). Setup below. |
 
@@ -189,8 +205,15 @@ website-generator/
 ├── SKILL.md                      # Main skill — workflow, tier logic, all steps
 ├── README.md                     # This file
 ├── skills-lock.json              # Companion skills manifest (16 skills, pinned)
-├── .env.example                  # FIRECRAWL_API_KEY + image-API key templates
+├── .env.example                  # FIRECRAWL_API_KEY + image-API keys + optional VERCEL_TOKEN
 ├── mcp.json.example              # Copyable .mcp.json for the 21st.dev Magic MCP
+├── briefs/                       # Niche-brief cache (Demo Mode; seeded ×5)
+│   ├── _index.md
+│   ├── restaurant.md
+│   ├── salon.md
+│   ├── contractor.md
+│   ├── dentist.md
+│   └── gym.md
 ├── prompts/                      # Prompt library (10 UI categories × 5 tiers)
 │   ├── _index.md
 │   ├── hero-sections.md
@@ -210,7 +233,10 @@ website-generator/
 ├── references/
 │   ├── component-registries.md   # shadcn registry catalogs + install contracts
 │   ├── 21st-dev-mcp.md           # 21st.dev Magic MCP setup, tools, fallback contract
-│   └── higgsfield.md             # Higgsfield MCP setup, image+video tools, scroll-video
+│   ├── higgsfield.md             # Higgsfield MCP setup, image+video tools, scroll-video
+│   ├── scroll-animation-best-practices.md  # 3D scroll mode: canvas/ffmpeg/preload contract
+│   ├── scroll-keyframe-prompts.md          # 3D scroll mode: ready-to-use keyframe prompts
+│   └── deploy-demo-assets.md     # Step 7: Vercel deploy, noindex, screenshots + GIF recipes
 ├── sources/
 │   └── _sources.md               # Harvest source tracking
 ├── harvest/                      # Workflow for populating the prompt library
