@@ -67,3 +67,25 @@ Higgsfield is for **photographic/generated imagery and video**. Brand **logos** 
 - **Tokens still win.** Generated visuals are art-directed by the Niche Design Brief's single style descriptor and the locked palette — they don't get to introduce an off-brand look.
 - **Download, don't hot-link.** Generation URLs are ephemeral; the only artifact crossing into the shipped site is the downloaded file in `public/`.
 - **Security.** The official MCP is account/session-authed — there's no key to leak, so nothing Higgsfield-related is ever committed.
+
+---
+
+## Model-routing cheat table (added 2026-07-05 — pick by JOB, not by habit)
+
+One consolidated routing view so every generation session routes media the same way. First
+match wins; every row still obeys the cost gate (`higgsfield_check_cost` before video spend,
+one generated set-piece per site).
+
+| Job | First choice | Fallbacks (in order) |
+|---|---|---|
+| Keyframe stills · text-on-image · og:image | **GPT Image 2** (via Higgsfield) | Gemini API (Nano Banana / Imagen, `GEMINI_API_KEY`) → Canva MCP |
+| End frame that must keep the product pixel-identical to the start | **Nano Banana Pro** (Higgsfield, reference mode — start frame as reference) | Gemini API Nano Banana with the start frame as image input |
+| Scroll-scrub transition clip (B3 / B10 — needs first+last frame) | **Kling FLF** (cheap) / **Seedance** (best) via Higgsfield | **Veo 3.1 via Gemini API** (last-frame control) → manual Flow MP4 (free with a Gemini Pro sub — drop in as `public/scroll-source.mp4`) → static start-frame hero |
+| Cinematic ambient hero loop / b-roll (no exact end frame needed) | **Veo** (Higgsfield roster or Gemini API) | Seedance → static hero |
+| Photographic stills at volume (sections, galleries) | **Higgsfield gen** (when MCP connected) | Pexels (`PEXELS_API_KEY`) → Neurascapes → Canva → placeholder |
+| Real-business demo sites | **`googlePhotos` from lead.json FIRST** | then the stills chain above |
+| Logos / brand marks | **`logo_search`** (21st.dev Magic MCP, SVG) | styled placeholder slot |
+
+**Wallet reminder:** Higgsfield = credit balance (check before video). Gemini API = pay-per-use
+Google wallet — a consumer Gemini Pro subscription does NOT cover it; the sub's included credits
+are only usable manually in the Gemini app / Flow (which is the zero-marginal-cost path).
