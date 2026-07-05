@@ -336,7 +336,7 @@ If the library is still empty (no prompts harvested yet), tell the user to run t
 
 Default stack: **Vite + React + Tailwind + Framer Motion**. Use vanilla HTML/CSS/JS instead if the sampled prompts clearly call for it, or a leaner stack for Tier 1 (a static dashboard rarely needs Framer Motion). For **Tier 4-5 sites that sample 3D prompts**, also add **React Three Fiber** (`@react-three/fiber` + `@react-three/drei`) for code-based 3D, or **`@splinetool/react-spline`** to embed a Spline scene — add these only when a 3D prompt is actually used so non-3D sites stay lean.
 
-**Motion & interactive components.** Framer Motion is already in the default stack — use it as the baseline for reveals, layout transitions, and gestures (the "Motion & interactive components" section maps which patterns to reach for per tier). For higher-impact pieces — animated heroes, particle/shader backgrounds, marquees, tactile buttons, scroll storytelling, charts, or whole blocks — pull from a **shadcn component registry** rather than hand-rolling. Seven are wired in, each with a distinct flavor: **Magic UI** (ambient effects, animated text), **Cult UI** (tactile/shader heroes, iOS widgets), **Skiper UI** (Apple-style scroll storytelling), **Watermelon** (app/dashboard UI, charts, blocks), **Aceternity UI** (award-site spotlight/3D-tilt/scroll effects), **ReactBits** (copy-paste text + micro-interactions), and **motion-primitives** (restrained production motion). See `references/component-registries.md` for the full catalogs, flavors, licenses, and family→category maps.
+**Motion & interactive components.** Framer Motion is already in the default stack — use it as the baseline for reveals, layout transitions, and gestures (the "Motion & interactive components" section maps which patterns to reach for per tier). For higher-impact pieces — animated heroes, particle/shader backgrounds, marquees, tactile buttons, scroll storytelling, charts, or whole blocks — pull from a **shadcn component registry** rather than hand-rolling. Seven are wired in, each with a distinct flavor: **Magic UI** (ambient effects, animated text), **Cult UI** (tactile/shader heroes, iOS widgets), **Skiper UI** (Apple-style scroll storytelling), **Watermelon** (app/dashboard UI, charts, blocks), **Aceternity UI** (award-site spotlight/3D-tilt/scroll effects), **ReactBits** (copy-paste text + micro-interactions), **motion-primitives** (restrained production motion), and **Kokonut UI** (polished app/product cards + glass effects). See `references/component-registries.md` for the full catalogs, flavors, licenses, and family→category maps.
 
 **21st.dev Magic builder (when the MCP is configured).** `21st_magic_component_builder` is a fifth, more powerful source: where a registry hands you a fixed component, the builder **generates bespoke React/TS code** to a description. Reach for it when no registry piece fits a sampled prompt, or when you want the 21st.dev implementation of a sampled idea rather than just its URL. Describe the component from the sampled prompt + the brief's vocabulary, take the returned code into `src/components/`, then **re-bind the locked palette/font tokens (Step 3.5) onto it** — builder output never introduces its own palette, and it still passes the Step 6 polish pass like any hand-written component. The one-flavor-per-site restraint guardrail applies: don't stack a builder hero on top of a registry hero. See `references/21st-dev-mcp.md`.
 
@@ -524,7 +524,7 @@ Keep durations honest (150–400ms for UI; longer only for hero set-pieces) and 
 
 ### Layer 2 — Component registries (high-impact, per-component)
 
-For pieces that are tedious or error-prone to hand-roll, pull from a **shadcn registry** instead of writing them from scratch. Seven are wired in — **pick the ONE whose flavor matches the locked design direction and the rolled blueprint** (don't mix registries; see the restraint guardrail):
+For pieces that are tedious or error-prone to hand-roll, pull from a **shadcn registry** instead of writing them from scratch. Eight are wired in — **pick the ONE whose flavor matches the locked design direction and the rolled blueprint** (don't mix registries; see the restraint guardrail):
 
 | Registry | Flavor — reach for it when… | Best tiers | License/cost |
 |----------|------------------------------|-----------|--------------|
@@ -535,8 +535,9 @@ For pieces that are tedious or error-prone to hand-roll, pull from a **shadcn re
 | **Aceternity UI** | the contemporary award-site look — spotlight & background-beam heroes, 3D card tilts, sticky-scroll reveals, hero parallax | 3-5 | free + paid templates |
 | **ReactBits** | animated text & micro-interaction variety — split/blur/decrypt text, hover cards, count-ups (copy-paste or jsrepo) | 3-5 | MIT, free |
 | **motion-primitives** | restrained, production-lean motion — text effects, morphing dialogs, carousels, accordions that stay tasteful | 2-4 | MIT, free |
+| **Kokonut UI** | polished app/product feel — activity cards, card stacks, pay/transfer cards, glass & liquid-glass | 3-4 | free + paid Pro |
 
-(Install contracts for the three newer registries are in `references/component-registries.md` — Aceternity and motion-primitives install via shadcn registry URLs like the first four; ReactBits is copy-paste/jsrepo.)
+(Install contracts for the newer registries are in `references/component-registries.md` — Aceternity, motion-primitives, and Kokonut UI (`@kokonutui/<slug>`) install via shadcn like the first four; ReactBits is copy-paste/jsrepo.)
 
 **Full catalogs, family→category maps, exact install commands, and per-registry caveats live in `references/component-registries.md` — read it once you've picked a registry.**
 
@@ -568,7 +569,7 @@ Generation contract + tool list in `references/higgsfield.md`; the scrub/render 
 More motion is not more better. Magic UI's own guidance and `emil-design-eng` enforce the same rule:
 
 - **One heavy experience blueprint per site, ever** (B1/B2/B3/B6/B10 — see `references/experience-blueprints.md`). Two heavies in one page reads as a tech demo; light patterns may support in other viewports.
-- **Pick one registry flavor per site, not all seven.** A Cult liquid-metal hero + a Magic UI globe + a Skiper scroll carousel stacked in one viewport reads as a demo reel, not a designed site — the variety this skill wants is *across* generations (each site feels different), not piled *within* one.
+- **Pick one registry flavor per site, not all eight.** A Cult liquid-metal hero + a Magic UI globe + a Skiper scroll carousel stacked in one viewport reads as a demo reel, not a designed site — the variety this skill wants is *across* generations (each site feels different), not piled *within* one.
 - **Start with 1 primary effect + 1 supporting effect per viewport** — one hero anchor (e.g. `globe`) plus one ambient layer (e.g. `particles`), not three stacked effects.
 - **Never stack multiple expensive animated backgrounds** in one viewport — it wrecks performance and contrast.
 - **Animated backgrounds must not reduce text contrast** — verify against the locked palette from the Quality Trio.

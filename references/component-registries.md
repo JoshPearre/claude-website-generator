@@ -155,3 +155,24 @@ direction and the rolled experience blueprint (`references/experience-blueprints
   CSS sticky covers lighter cases. `gsap.registerPlugin(ScrollTrigger)`.
 - **React Three Fiber + drei** (`npm i three @react-three/fiber @react-three/drei`) — B1/B2/B3/B5
   WebGL builds. DRACO-compress GLTFs; cap `dpr={[1, 2]}`; pause offscreen.
+
+### Kokonut UI — animated app/product components (added 2026-07-05, verified)
+- **Flavor:** 100+ animated, product-feeling components — Apple Activity Card, card stacks,
+  quick-pay/transfer cards, glass & liquid-glass effects. Reads "polished app", between Magic UI's
+  ambient effects and Watermelon's functional blocks.
+- **Install:** shadcn-compatible — `npx shadcn@latest add @kokonutui/<slug>` (browse kokonutui.com).
+  React + TS + Tailwind v4 + Motion.
+- **Best tiers:** 3–4. **License:** free; Pro = paid templates.
+- **Caveat:** components assume Tailwind v4 — on the default Vite scaffold confirm the Tailwind
+  major first, and re-bind locked tokens as always.
+
+### Motion rebrand note (2026)
+Framer Motion is now **Motion** — `npm i motion`, `import { motion } from "motion/react"`. The
+`framer-motion` package still works but is legacy; new scaffolds should use `motion`. (Its docs'
+"Curtains" page-transition examples are Motion+ paid — don't cite them as free references.)
+
+### anime.js v4 — lightweight scroll/drag alternative (verified)
+`npm i animejs` — MIT, ~6KB gzipped. `onScroll` observer + draggable + spring easings + SVG morph.
+Reach for it on Tier 2–3 sites where GSAP would be overkill but you want scroll-linked accents
+beyond Framer's `useScroll` (e.g. a single SVG line-draw or counter). One motion engine per
+concern — don't run GSAP and anime.js on the same page.

@@ -47,7 +47,7 @@ fallback. Stack shorthand: **FM** = Framer Motion, **GSAP** = gsap + ScrollTrigg
 `gsap`), **R3F** = @react-three/fiber + @react-three/drei, **Lenis** = smooth scroll.
 
 ### B1 — Persistent 3D World  `[Tier 4–5 · L · perf: medium-high]`
-*(mont-fort.com — the mountain that lives behind everything)*
+*(mont-fort.com — the mountain that lives behind everything; playful register: threejs.paris and poch.studio — oversized 3D characters/objects the pointer plays with)*
 One WebGL scene mounted OUTSIDE the router/page content (fixed, z-0); content scrolls over it.
 Navigation (tabs, routes, section anchors) doesn't swap the scene — it **tweens the camera** to a
 new position/target (GSAP to camera.position + lookAt, 1–1.6s, expo.out). Pointer move adds
@@ -73,7 +73,7 @@ the site by scrolling.
 - Fallback: the scene's keyframe stills as a pinned image sequence (B6 downgrade).
 
 ### B3 — Exploded Assembly  `[Tier 4–5 · L · perf: high]`
-*(GQ watch teardown; the user's "exploding objects that reveal information")*
+*(GQ watch teardown; ylem.watch — the luxury register: a monochrome watch mechanism that disassembles as you scroll; the user's "exploding objects that reveal information")*
 A product/object separates into its parts as the visitor scrolls — each separation phase pauses
 at an info card explaining that part — then optionally reassembles at the end. The single best
 "show, don't tell" pattern for products and processes.
@@ -96,7 +96,9 @@ velocity (liquid warp on fast scroll, settling when still).
   lines inside `overflow:hidden` wrappers, translateY 100%→0 staggered; Lenis; parallax depth via
   two scrub speeds (bg 0.5×, fg 1.1×).
 - Tier 5 build: + curtains.js or R3F image planes, UV-offset fragment shader driven by scroll
-  velocity; velocity also nudges letter-spacing or skew for the "alive" feel.
+  velocity; velocity also nudges letter-spacing or skew for the "alive" feel. Aggressive register:
+  RGB-split / displacement-map glitch on images and type (the music/agency look — e.g. the HXD
+  artist-roster site) — reserve for youth/culture/creative niches; it actively fights trust niches.
 - Fallback: opacity/transform reveals only.
 
 ### B5 — 3D Slider / Gallery Tunnel  `[Tier 3–5 · M · perf: medium]`
