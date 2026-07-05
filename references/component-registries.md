@@ -112,3 +112,46 @@ The default scaffold is **Vite + React + Tailwind + Framer Motion** with `.jsx` 
 - **Functional UI, dashboard, charts, or a whole block — including Tier 1-2?** → Watermelon UI
 
 Pick the registry whose flavor matches the locked design direction, pull the **one or two** pieces the design actually needs, and let the restraint guardrail in SKILL.md keep it from becoming a demo reel.
+
+---
+
+## Added 2026-07-05 — three more registries + the motion stack
+
+Same rules as the four above: pick ONE registry flavor per site, matched to the locked design
+direction and the rolled experience blueprint (`references/experience-blueprints.md`).
+
+### Aceternity UI — the contemporary award-site look
+- **Flavor:** spotlight + background-beam heroes, 3D card tilts (perspective hover), sticky-scroll
+  reveals, lamp/aurora effects, hero parallax, bento showcases. The house style of the modern
+  dark-gradient award site — deploy with restraint on anything Tier 3.
+- **Install:** shadcn-compatible registry — `npx shadcn@latest add https://ui.aceternity.com/registry/<slug>.json`
+  (browse slugs at ui.aceternity.com/components). Components are React + Tailwind + Framer Motion
+  (`motion` package); some need `clsx`/`tailwind-merge` (standard shadcn utils).
+- **Best tiers:** 3–5. **License:** components free; templates paid.
+- **Caveat:** its defaults skew dark-on-dark — re-bind the locked palette tokens; never ship its
+  demo colors.
+
+### ReactBits — animated text + micro-interaction variety
+- **Flavor:** split/blur/decrypt/shiny text reveals, count-ups, hover cards, dock menus, threads —
+  a wide grab-bag of small signature moves (strong for the B9 Kinetic Type blueprint).
+- **Install:** copy-paste from reactbits.dev, or the jsrepo CLI (`npx jsrepo add <block>` per the
+  site's per-component instructions). JS/TS + Tailwind/plain-CSS variants per component.
+- **Best tiers:** 3–5. **License:** MIT, free.
+- **Caveat:** quality varies more than the curated registries — run pulled components through the
+  Step 6 polish pass and re-bind tokens.
+
+### motion-primitives — restrained, production-lean motion
+- **Flavor:** text effects, morphing dialogs, carousels, accordions, animated backgrounds that stay
+  tasteful — the registry for Tier 2–4 sites that want polish without spectacle.
+- **Install:** shadcn-compatible — `npx shadcn@latest add "https://motion-primitives.com/c/<slug>.json"`
+  (browse at motion-primitives.com). React + Tailwind + `motion`.
+- **Best tiers:** 2–4. **License:** MIT, free.
+
+### The motion stack itself (not registries — npm deps per blueprint)
+- **Lenis** (`npm i lenis`) — smooth scroll, ~3KB. Default on Tier 3+. `const lenis = new Lenis({ lerp: 0.1 })`
+  + RAF loop; connect to ScrollTrigger via `lenis.on('scroll', ScrollTrigger.update)`.
+- **GSAP + ScrollTrigger** (`npm i gsap`) — free including all plugins. Reach for it when the
+  blueprint needs pinning, scrubbed timelines, or camera tweens (B1/B2/B6/B7); Framer Motion +
+  CSS sticky covers lighter cases. `gsap.registerPlugin(ScrollTrigger)`.
+- **React Three Fiber + drei** (`npm i three @react-three/fiber @react-three/drei`) — B1/B2/B3/B5
+  WebGL builds. DRACO-compress GLTFs; cap `dpr={[1, 2]}`; pause offscreen.

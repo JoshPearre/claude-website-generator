@@ -13,7 +13,7 @@ Trigger on any request to build, generate, or scaffold a website, web app, landi
 
 ## Workflow overview
 
-Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → sample prompts from the library **(brief biases the categories; live 21st.dev via the Magic MCP when configured — see section below)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(Higgsfield-generated when its MCP is connected, else keyed image API — both queried from the brief's style descriptor, downloaded into `public/`; Tier 4-5 may add opt-in Higgsfield scroll video)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → **deploy & demo assets (Step 7: Vercel deploy — noindex on demos — full-page + phone screenshots and a scrolling GIF into `demo-assets/`, Lighthouse on full-pipeline runs)** → report what was used.
+Intake (2 questions) → **niche design intelligence (study how the niche LOOKS → write a Niche Design Brief)** → pick a design tier **(brief confirms/adjusts the default)** → **roll the experience blueprint (Step 2.5 — the site's signature interaction, tier-gated + randomized for variety; `references/experience-blueprints.md`)** → sample prompts from the library **(brief biases the categories; live 21st.dev via the Magic MCP when configured — see section below)** → **Quality Trio (`impeccable teach` + `ui-ux-pro-max` + `design-taste-frontend`) to lock tokens — binding the brief's design direction (palette + fonts) when no brand is supplied** → compose a multi-file scaffold **(Tier 3-5: layer in motion — Framer Motion patterns + component registries (Magic UI · Cult UI · Skiper UI · Watermelon) per the brief's motion character, see "Motion & interactive components")** → source image assets **(Higgsfield-generated when its MCP is connected, else keyed image API — both queried from the brief's style descriptor, downloaded into `public/`; Tier 4-5 may add opt-in Higgsfield scroll video)** → **polish pass (`impeccable critique` + `polish`, plus `emil-design-eng` consult on Tier 3+)** → **deploy & demo assets (Step 7: Vercel deploy — noindex on demos — full-page + phone screenshots and a scrolling GIF into `demo-assets/`, Lighthouse on full-pipeline runs)** → report what was used.
 
 Follow the steps below in order. **Do not write any files until Step 4** (sole exception: the Step 1.5 niche-brief cache write, which touches this skill's own `briefs/` folder, never the project). The **Quality Trio** call (see "Design quality" section below) happens between Step 3 and Step 4 and is required, not optional. The **polish pass** (Step 6) runs after Step 5 and is also required — the scaffold is not "done" until critique returns clean. **Step 7 (deploy & demo assets)** then closes every run: the run report's last lines are always the live URL and the demo-asset paths.
 
@@ -51,6 +51,7 @@ Differentiate each site on **all** of these, never a subset:
 | Axis | What must differ across siblings |
 |------|----------------------------------|
 | **Design intensity** | Independently roll a **random tier 1–5 per site** — do **not** reuse the niche-default tier. Don't repeat an intensity until all five are used. Different intensity cascades into a different stack, motion level, and registry. |
+| **Experience blueprint** | No two siblings share a blueprint (B1–B10 in `references/experience-blueprints.md`) — reroll on collision. A Tier 1–2 sibling's "no blueprint" is itself a distinct value on this axis. |
 | **Structure (HTML / JSX / DOM)** | Different section count and order, different page architecture, different component composition. Not the same skeleton reordered. |
 | **CSS / design system** | Different palette, font pairing, spacing scale, and **style family** (e.g. minimal vs brutalist vs glassmorphism vs editorial). No palette or pairing repeats across the set. |
 | **Every UI component** | No component pattern reused across siblings — a hero in site 1 may not reappear in site 2. Re-sample with **zero prompt overlap** between siblings (track what each site used; resample on collision). |
@@ -76,7 +77,9 @@ Differentiate each site on **all** of these, never a subset:
 
 ### Before delivering, verify every pair of sites differs on:
 
-structure · palette / fonts / style · every component · layout positions · images (and image count) · copy · tier. If any two siblings match on a whole axis, regenerate the later one.
+structure · palette / fonts / style · every component · layout positions · images (and image count) · copy · tier · experience blueprint. If any two siblings match on a whole axis, regenerate the later one.
+
+**Mechanical check (required for 3+ sites):** write a `differentiation-manifest.json` at each site's root — `{ tier, direction, blueprint, fontPair, accent, sectionOrder: [...], promptIds: [...], imageQuerySeeds: [...] }` — then diff every pair of manifests before delivering. Any two sites matching on a whole axis = regenerate the later one. The honor system does not survive a fast batch run; the manifest diff does.
 
 ---
 
@@ -131,7 +134,8 @@ When a `lead.json` is provided, **do not ask the Step 1 questions** — the reco
 |---|---|
 | Step 1 — two intake questions | **skipped** — `lead.json` supplies everything |
 | Step 1.5 — visual research (~10 min) | **cached Niche Design Brief** from `briefs/<niche-slug>.md` when one exists; on a miss, research once (time-boxed as written) and **write the brief to the cache** so the next lead in that niche is free |
-| Step 2 — tier deliberation + shift window | **fixed at Tier 3 — Modern Consumer**, overriding the map/brief default. Still print the transparency line; don't wait for a reply |
+| Step 2 — tier deliberation + shift window | **auto-tiered by lead quality — no deliberation.** Default **Tier 3**; upgrade to **Tier 4** when the lead reads high-value (`rating ≥ 4.5` **and** `reviewCount ≥ 75`) — a strong business deserves a demo that undersells nothing, and the extra ~5 min pays for itself. Never Tier 5 in Demo Mode. Still print the transparency line; don't wait for a reply |
+| Step 2.5 — experience blueprint roll | **Tier 3 demos: none** (foundation craft only — entrance choreography, easing, reveals). **Tier 4 demos: roll one LIGHT blueprint** (B7 Horizontal Drift / B8 Sticky-Stack / B9 Kinetic Type / CSS builds of B4/B5) — never a heavy one (B1/B2/B3/B6/B10 cost too much time for spec work) |
 | `higgs_hero` / 3D scroll-video hero | **always OFF** — standard hero from the brief's archetype. (An explicit user request for a scroll-scrub hero still wins — user overrides always win — but then accept the time cost) |
 | Step 3.5 — Quality Trio (required) | still runs, but **best-effort with silent fallback**: a missing or failing companion skill never blocks — bind the design direction's defaults, continue, and note it in the run report (mirror the Step 5 image chain's never-hard-fail pattern) |
 | Step 6 — loop-until-clean + `emil-design-eng` | **one `critique` + one `polish` pass**, no loop; skip `emil-design-eng` and the `refiner` |
@@ -153,6 +157,21 @@ A batch of leads = **one site per business**, looped through Demo Mode. This is 
 
 - Same-niche leads share a cached brief, so **vary the surface per lead** — different `--accent`, different section order, their own `googlePhotos`, and fresh copy. Two competing salons must never receive the same demo.
 - Report per lead: `leadId` · live URL · demo-asset paths (the Step 7 report lines) — **one block per lead as it finishes, then end the batch run with a summary table (leadId · URL · GIF path) as the report's final lines**, so AgenticOS can match assets back to leads.
+
+### Demo Factory write-back (`demo-result.json`)
+
+When the `lead.json` came from a folder on disk (an AgenticOS Demo Factory export — `<folder>/<lead-slug>/lead.json`), close the loop after Step 7 by writing **`demo-result.json` next to the consumed `lead.json`** (temp-then-rename, same discipline as the export):
+
+```json
+{
+  "leadId": "<echoed from lead.json>",
+  "demoUrl": "<the live deploy URL>",
+  "screenshotPath": "<absolute path to demo-assets/desktop-full.png>",
+  "gifPath": "<absolute path to demo-assets/scroll-demo.gif>"
+}
+```
+
+AgenticOS's "Import demo results" scans for these files, attaches `demoUrl` + screenshot to each lead, and outreach for that lead automatically switches to demo-led copy with the screenshot embedded. Skip the write-back when the lead.json was pasted inline (no folder to write to) — the run-report block is the fallback the user can act on manually.
 
 ---
 
@@ -264,11 +283,37 @@ The tier system is the core of this skill. There are five tiers:
 
 > Niche: [niche]. Selected design tier: [N] — [tier name]. Say "tone it down" or "go wild" to shift tiers.
 
-If the user replies with a shift command, move one tier down ("tone it down") or up ("go wild") and **resample (Step 3) at the new tier** before creating any files. **Demo Mode:** the tier is fixed at 3 and the line is informational — print it and keep moving (see the Demo Mode section).
+If the user replies with a shift command, move one tier down ("tone it down") or up ("go wild") and **resample (Step 3) at the new tier** before creating any files. **Demo Mode:** the tier is auto-set from lead quality (see the Demo Mode section) and the line is informational — print it and keep moving.
 
 **If the user has not named a brand or given a reference URL**, also auto-select a **design direction** here — the aesthetic anchor that supplies palette + fonts (see `directions/design-directions.md` for the soft niche/tier → direction map) — and name it in the same line, e.g. *"Direction: Modern minimal — name a brand or pick another direction to change the look."* The direction is bound to `:root` in Step 3.5; naming it now lets the user redirect early.
 
 **Also decide the `higgs_hero` toggle here** (the Higgs Field scroll-interactive video hero — see its dedicated section below). Default it from tier + niche: **ON** for Tier 5 or visually-driven niches (restaurant, hospitality, real estate, automotive, fashion/beauty, fitness, events, agency, portfolio, product launch); **OFF** for Tier 1–3 and text/utility niches (dashboards, SaaS consoles, law/medical/finance intake, B2B docs, info sites). State it in the same transparency line and let the user flip it — *"Hero: Higgs scroll-video ON (recommended) — say 'simple hero' to turn it off."* "go wild" / "maximum" / "most interactive" / "make it cinematic" forces it ON; "tone it down" / "keep it simple" / "make it fast" forces it OFF. **Demo Mode forces it OFF** (an explicit user request for a scroll-scrub hero still wins).
+
+## Step 2.5 — Roll the experience blueprint (Tier 3+)
+
+Read `references/experience-blueprints.md` and **roll the site's signature experience** — the
+whole-page interaction archetype everything else supports (persistent 3D world, camera
+fly-through, exploded assembly, immersive reveal, 3D slider, pinned scrollytelling, horizontal
+drift, sticky-stack, kinetic type, scroll-scrub video). The roll is what makes consecutive
+generations feel like different studios built them.
+
+- **Tier 1–2:** no blueprint — the foundation layer (choreographed entrance, easing quality,
+  designed states, progressive disclosure) IS the experience. Service-trust niches stay here
+  unless the user explicitly asks for more.
+- **Tier 3:** roll **one light blueprint** from the tier table.
+- **Tier 4:** roll **one heavy** (+ optionally one light in a different viewport).
+- **Tier 5:** one signature heavy, fully expressed — shader builds unlocked, full creative
+  liberty. This is the award-entry tier: the blueprint, the foundation craft, and the Step 6
+  polish loop together are what "site of the day" is made of.
+- Roll **randomly among the allowed options**, biased by the brief's motion character (the
+  blueprint file has the bias map). Don't repeat the previous run's blueprint when the same user
+  generates again — track it like the multi-site axis.
+- A user request naming an experience ("exploding product", "fly-through", "make it cinematic")
+  **replaces the roll at any tier** — explicit override always wins, both directions.
+- `higgs_hero` ON is equivalent to rolling B10 (scroll-scrub video hero) as the heavy blueprint.
+
+Append the roll to the Step 2 transparency line: *"Experience: B3 — Exploded Assembly (say
+'different experience' to reroll, or name one)."*
 
 ## Step 3 — Sample prompts from the library
 
@@ -291,7 +336,7 @@ If the library is still empty (no prompts harvested yet), tell the user to run t
 
 Default stack: **Vite + React + Tailwind + Framer Motion**. Use vanilla HTML/CSS/JS instead if the sampled prompts clearly call for it, or a leaner stack for Tier 1 (a static dashboard rarely needs Framer Motion). For **Tier 4-5 sites that sample 3D prompts**, also add **React Three Fiber** (`@react-three/fiber` + `@react-three/drei`) for code-based 3D, or **`@splinetool/react-spline`** to embed a Spline scene — add these only when a 3D prompt is actually used so non-3D sites stay lean.
 
-**Motion & interactive components.** Framer Motion is already in the default stack — use it as the baseline for reveals, layout transitions, and gestures (the "Motion & interactive components" section maps which patterns to reach for per tier). For higher-impact pieces — animated heroes, particle/shader backgrounds, marquees, tactile buttons, scroll storytelling, charts, or whole blocks — pull from a **shadcn component registry** rather than hand-rolling. Four are wired in, each with a distinct flavor: **Magic UI** (ambient effects, animated text), **Cult UI** (tactile/shader heroes, iOS widgets), **Skiper UI** (Apple-style scroll storytelling), and **Watermelon** (app/dashboard UI, charts, blocks). See `references/component-registries.md` for the full catalogs, flavors, licenses, and family→category maps.
+**Motion & interactive components.** Framer Motion is already in the default stack — use it as the baseline for reveals, layout transitions, and gestures (the "Motion & interactive components" section maps which patterns to reach for per tier). For higher-impact pieces — animated heroes, particle/shader backgrounds, marquees, tactile buttons, scroll storytelling, charts, or whole blocks — pull from a **shadcn component registry** rather than hand-rolling. Seven are wired in, each with a distinct flavor: **Magic UI** (ambient effects, animated text), **Cult UI** (tactile/shader heroes, iOS widgets), **Skiper UI** (Apple-style scroll storytelling), **Watermelon** (app/dashboard UI, charts, blocks), **Aceternity UI** (award-site spotlight/3D-tilt/scroll effects), **ReactBits** (copy-paste text + micro-interactions), and **motion-primitives** (restrained production motion). See `references/component-registries.md` for the full catalogs, flavors, licenses, and family→category maps.
 
 **21st.dev Magic builder (when the MCP is configured).** `21st_magic_component_builder` is a fifth, more powerful source: where a registry hands you a fixed component, the builder **generates bespoke React/TS code** to a description. Reach for it when no registry piece fits a sampled prompt, or when you want the 21st.dev implementation of a sampled idea rather than just its URL. Describe the component from the sampled prompt + the brief's vocabulary, take the returned code into `src/components/`, then **re-bind the locked palette/font tokens (Step 3.5) onto it** — builder output never introduces its own palette, and it still passes the Step 6 polish pass like any hand-written component. The one-flavor-per-site restraint guardrail applies: don't stack a builder hero on top of a registry hero. See `references/21st-dev-mcp.md`.
 
@@ -439,16 +484,28 @@ Three assets, in order:
 The run report (tier, direction, sampled prompts + sources, fallbacks that fired, Lighthouse scores on full runs) **must end with these lines, always last**:
 
 ```
+Blueprint:   <B# — name, or "none (tier 1–2 / foundation only)">
+Skills run:  <which companion skills actually executed vs silently fell back — e.g. "impeccable ✓ · ui-ux-pro-max ✓ · design-taste-frontend SKIPPED (not installed)">
 Live URL:    <deployment URL, or "deploy skipped — <reason>">
 Screenshots: demo-assets/desktop-full.png · demo-assets/phone-390.png
 Scroll GIF:  demo-assets/scroll-demo.gif
 ```
 
+The `Skills run` line exists because silent fallbacks were invisible before — a demo that shipped without the Quality Trio should say so, not pretend it ran.
+
 Demo Mode prepends the `leadId` to this block so AgenticOS can match assets back to the lead. **Batch Demo Mode:** emit one block per lead as it finishes, then close the whole report with the batch summary table (leadId · URL · GIF path) as the true final lines.
 
 ## Motion & interactive components (Tier 3-5)
 
-Motion is what separates a Tier 3-5 site from a static brochure. Two layers, used together.
+Motion is what separates a Tier 3-5 site from a static brochure. The **experience blueprint**
+(Step 2.5, `references/experience-blueprints.md`) decides the site's signature set-piece; the
+layers below supply the vocabulary that builds it and everything around it.
+
+**Foundation add-ons (Tier 3+):** wire **Lenis** smooth scroll (`lenis` on npm) on every Tier 3+
+site — it makes all scroll motion feel a class more expensive for ~3KB. Add **GSAP + ScrollTrigger**
+(free on npm, all plugins included) only when the rolled blueprint calls for pinning/scrubbing
+(B1/B2/B6/B7) — CSS sticky + Framer `useScroll` covers the lighter cases. When both are present,
+connect them: `lenis.on('scroll', ScrollTrigger.update)`.
 
 ### Layer 1 — Framer Motion (baseline, already in the stack)
 
@@ -467,7 +524,7 @@ Keep durations honest (150–400ms for UI; longer only for hero set-pieces) and 
 
 ### Layer 2 — Component registries (high-impact, per-component)
 
-For pieces that are tedious or error-prone to hand-roll, pull from a **shadcn registry** instead of writing them from scratch. Four are wired in — **pick the one whose flavor matches the locked design direction** (don't pull from all four; see the restraint guardrail):
+For pieces that are tedious or error-prone to hand-roll, pull from a **shadcn registry** instead of writing them from scratch. Seven are wired in — **pick the ONE whose flavor matches the locked design direction and the rolled blueprint** (don't mix registries; see the restraint guardrail):
 
 | Registry | Flavor — reach for it when… | Best tiers | License/cost |
 |----------|------------------------------|-----------|--------------|
@@ -475,6 +532,11 @@ For pieces that are tedious or error-prone to hand-roll, pull from a **shadcn re
 | **Cult UI** | tactile/premium — shader & liquid-metal heroes, metal/neumorph buttons, iOS widgets (dynamic island, family button) | 3-5 | free + paid Pro |
 | **Skiper UI** | Apple-style scroll storytelling — clip-path carousels, card-stack scroll, parallax/blur text | 3-5 (scroll) | free + paid |
 | **Watermelon** | functional breadth — forms, tables, charts (Recharts), dashboards, whole blocks/login forms | 1-4 | MIT, free |
+| **Aceternity UI** | the contemporary award-site look — spotlight & background-beam heroes, 3D card tilts, sticky-scroll reveals, hero parallax | 3-5 | free + paid templates |
+| **ReactBits** | animated text & micro-interaction variety — split/blur/decrypt text, hover cards, count-ups (copy-paste or jsrepo) | 3-5 | MIT, free |
+| **motion-primitives** | restrained, production-lean motion — text effects, morphing dialogs, carousels, accordions that stay tasteful | 2-4 | MIT, free |
+
+(Install contracts for the three newer registries are in `references/component-registries.md` — Aceternity and motion-primitives install via shadcn registry URLs like the first four; ReactBits is copy-paste/jsrepo.)
 
 **Full catalogs, family→category maps, exact install commands, and per-registry caveats live in `references/component-registries.md` — read it once you've picked a registry.**
 
@@ -505,7 +567,8 @@ Generation contract + tool list in `references/higgsfield.md`; the scrub/render 
 
 More motion is not more better. Magic UI's own guidance and `emil-design-eng` enforce the same rule:
 
-- **Pick one registry flavor per site, not all four.** A Cult liquid-metal hero + a Magic UI globe + a Skiper scroll carousel stacked in one viewport reads as a demo reel, not a designed site — the variety this skill wants is *across* generations (each site feels different), not piled *within* one.
+- **One heavy experience blueprint per site, ever** (B1/B2/B3/B6/B10 — see `references/experience-blueprints.md`). Two heavies in one page reads as a tech demo; light patterns may support in other viewports.
+- **Pick one registry flavor per site, not all seven.** A Cult liquid-metal hero + a Magic UI globe + a Skiper scroll carousel stacked in one viewport reads as a demo reel, not a designed site — the variety this skill wants is *across* generations (each site feels different), not piled *within* one.
 - **Start with 1 primary effect + 1 supporting effect per viewport** — one hero anchor (e.g. `globe`) plus one ambient layer (e.g. `particles`), not three stacked effects.
 - **Never stack multiple expensive animated backgrounds** in one viewport — it wrecks performance and contrast.
 - **Animated backgrounds must not reduce text contrast** — verify against the locked palette from the Quality Trio.
@@ -620,6 +683,12 @@ Skill(skill="design-taste-frontend")
 Taste Skill v2 reads the brief and infers whether the chosen direction looks templated. It is the final gate before file writes — if it flags the direction as generic, **resample (Step 3) and re-run the trio**, do not just push through.
 
 Write all locked tokens into `src/styles/tokens.css` (or `tailwind.config.js` `theme.extend`) and reference them in every component. The generated `README.md` must list the chosen design direction (or brand/reference source) plus the exact palette, font pairing, and style.
+
+**Design ticket checkpoint (full pipeline, interactive runs).** Once the trio has locked tokens, print a compact **design ticket** before Step 4 writes any files:
+
+> **Design ticket** — Tier N (name) · Direction: X · Palette: [accent + temperature] · Fonts: [display/body] · Experience: B# (name) · Motion: [character] · Images: [style descriptor, one line]. Reply **go**, or redirect any line ("different fonts", "warmer palette", "different experience") and I'll re-lock before building.
+
+On an interactive full-pipeline run, **wait for the reply** — this is the cheapest moment to catch "wrong direction" (after it, changes cost a rebuild). In **Demo Mode and batch runs, print it and keep moving** (nobody is watching a batch), and in any run where the user has already said "just build it", don't re-ask.
 
 ### Required: Step 6 — polish pass (after files exist)
 
