@@ -176,3 +176,18 @@ Framer Motion is now **Motion** — `npm i motion`, `import { motion } from "mot
 Reach for it on Tier 2–3 sites where GSAP would be overkill but you want scroll-linked accents
 beyond Framer's `useScroll` (e.g. a single SVG line-draw or counter). One motion engine per
 concern — don't run GSAP and anime.js on the same page.
+
+### Bklit UI — design-engineered charts (added 2026-07-05, verified at bklit.com)
+- **Flavor:** the charts specialist — 17 chart types: area, bar, candlestick, choropleth, composed,
+  funnel, gauge, heatmap, line, LIVE line, pie, profit/loss, radar, ring, sankey, scatter, sunburst.
+  Design-engineered (Vercel OSS program; endorsed by shadcn). Has a Studio chart-builder at
+  bklit.com/studio with video export.
+- **Install:** shadcn TRUSTED registry — namespace `@bklit` is on the shadcn registry index
+  (auto-configured on new projects): `npx shadcn@latest add @bklit/<slug>` (e.g. `@bklit/area-chart`).
+  Manual `components.json` entry if needed: `"@bklit": "https://ui.bklit.com/r/{name}.json"`.
+  Loading labels ship via `@bklit/shimmering-text` (auto-included with line/area/heatmap).
+- **Best tiers:** 1–4 (any site with data: dashboards, finance, fitness stats, "results" sections).
+- **License:** open source (Vercel OSS program).
+- **Registry-restraint carve-out:** like Watermelon, Bklit is FUNCTIONAL, not decorative — it may
+  coexist with the site's one effect registry. When a site needs charts, prefer Bklit over
+  Watermelon's Recharts wrappers; Watermelon keeps forms/tables/blocks.
