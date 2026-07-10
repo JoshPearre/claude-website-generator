@@ -37,8 +37,9 @@ Claude Code picks up skills from `~/.claude/skills/` automatically — no config
 | 3 | Modern consumer | Startups, apps, agencies |
 | 4 | Expressive brand | High-end studios, luxury products |
 | 5 | Experimental / maximalist | Creative agencies, art portfolios |
+| **C** | **Cinematic Story Experience** (opt-in, never auto-selected) | Businesses worth a film — the site is built around a Higgsfield-generated cinematic background whose chapters follow the business's facets as you scroll |
 
-The tier is auto-selected from `tiers/tier-niche-map.md` based on your niche, or you can override it.
+The tier is auto-selected from `tiers/tier-niche-map.md` based on your niche, or you can override it. **Tier C is the exception — explicit request only** ("cinematic experience", "story site", "film website"): the skill directs a story (vibe options → draft mockups → cost-confirmed generation), builds a scroll-scrubbed hero plus one looping scene per business facet crossfaded on scroll, and overlays library-sampled UI components as the background moves. Every Higgsfield spend is estimated and confirmed first. Playbook: [`references/cinematic-tier.md`](references/cinematic-tier.md) (reference implementations: harbor-dev-v3.vercel.app for scroll↔video binding, stewardengine.com and headlandmarketing.com for story logic).
 
 ### Design directions (5 fallbacks)
 
@@ -160,7 +161,7 @@ claude mcp add --transport http --scope user higgsfield https://mcp.higgsfield.a
 
 Then authenticate in the browser when prompted; `claude mcp list` should show `higgsfield … √ Connected`. Full setup, the tool contract, and the scroll-video pipeline: [`references/higgsfield.md`](references/higgsfield.md).
 
-> **Cost:** images are cheap-ish, but **video is real credits per clip** — the skill gates video on a cost check and treats it as opt-in, Tier 4-5 only. It never spends credits on its own without the work calling for it.
+> **Cost:** images are cheap-ish, but **video is real credits per clip** — the skill gates video on a cost check and treats it as opt-in, Tier 4-5 / Tier C only. Tier C additionally prints a full clip-plan estimate table and waits for an explicit "generate" before any video spend. It never spends credits on its own without the work calling for it.
 
 ---
 
@@ -236,6 +237,7 @@ website-generator/
 │   ├── higgsfield.md             # Higgsfield MCP setup, image+video tools, scroll-video
 │   ├── scroll-animation-best-practices.md  # 3D scroll mode: canvas/ffmpeg/preload contract
 │   ├── scroll-keyframe-prompts.md          # 3D scroll mode: ready-to-use keyframe prompts
+│   ├── cinematic-tier.md         # Tier C: story intake, vibes, mockups, clip plan, chapter loops
 │   └── deploy-demo-assets.md     # Step 7: Vercel deploy, noindex, screenshots + GIF recipes
 ├── sources/
 │   └── _sources.md               # Harvest source tracking

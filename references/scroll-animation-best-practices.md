@@ -4,6 +4,13 @@
 > When that mode is triggered (see SKILL.md → "3D scroll animation — scroll-scrubbed hero"),
 > follow this document precisely for the canvas/ffmpeg/preload/scroll implementation.
 > This is the same core technique used on Apple's AirPods, MacBook, and iPhone product pages.
+>
+> **Live reference implementation: https://harbor-dev-v3.vercel.app** — a known-good
+> scroll↔video binding in production (also the Tier C exemplar, `cinematic-tier.md`). If a
+> scrub or scroll-crossfade you built feels choppy, fetch/inspect that site and match its
+> binding approach before adding more code — one comparison pass has fixed this in practice.
+> It is a comparison aid, never a dependency: if the site is down or has changed, this
+> document's written contract remains the source of truth.
 
 ---
 

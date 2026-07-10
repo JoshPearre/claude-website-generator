@@ -1,6 +1,6 @@
 ---
 name: website-generator
-description: Generate a complete multi-file website project scaffold by composing UI prompts from a curated, design-intensity-tiered prompt library. Use this skill whenever the user wants to build, generate, scaffold, redesign, or create a website, web app, landing page, or marketing site — including phrases like "build me a website", "generate a site", "create a landing page", "make a site for my [business/niche]", or any request to produce a website for a specific niche or audience. The skill matches design intensity (minimal utility to experimental/maximalist) to the site's purpose and produces a real Vite + React project folder. Also use this skill whenever the user wants to create 3D / scroll-driven / Apple-style scroll animations — scroll-scrubbed product or video heroes (e.g. "create 3D scroll animations", "scroll animation", "scrollytelling hero", or "turn this MP4/product into a scroll-driven frame animation"). Also trigger **Demo Mode** — the fast outreach path — when the user says "demo mode", passes `--demo`, or hands you a `lead.json` lead record (e.g. an AgenticOS export): intake questions are skipped and the skill builds + deploys a noindexed demo site for that business.
+description: Generate a complete multi-file website project scaffold by composing UI prompts from a curated, design-intensity-tiered prompt library. Use this skill whenever the user wants to build, generate, scaffold, redesign, or create a website, web app, landing page, or marketing site — including phrases like "build me a website", "generate a site", "create a landing page", "make a site for my [business/niche]", or any request to produce a website for a specific niche or audience. The skill matches design intensity (minimal utility to experimental/maximalist) to the site's purpose and produces a real Vite + React project folder. Also trigger **Tier C — Cinematic Story Experience** when the user asks for a "cinematic experience", "cinematic website", "story site", "film website", "tell the business's story as you scroll", or wants a Higgsfield-generated background film whose chapters follow the business's facets as the visitor scrolls. Also use this skill whenever the user wants to create 3D / scroll-driven / Apple-style scroll animations — scroll-scrubbed product or video heroes (e.g. "create 3D scroll animations", "scroll animation", "scrollytelling hero", or "turn this MP4/product into a scroll-driven frame animation"). Also trigger **Demo Mode** — the fast outreach path — when the user says "demo mode", passes `--demo`, or hands you a `lead.json` lead record (e.g. an AgenticOS export): intake questions are skipped and the skill builds + deploys a noindexed demo site for that business.
 ---
 
 # Website Generator
@@ -40,7 +40,7 @@ This skill ships a **frozen snapshot** of 21st.dev (28 hand-harvested prompts in
 
 ## Multi-site requests — total differentiation mandate (3+ designs)
 
-**Trigger:** the user asks for **three or more** websites, designs, variations, options, versions, concepts, or mockups in a single request ("make me 3 sites", "give me 5 designs", "a few different versions", "some options for my restaurant").
+**Trigger:** the user asks for **three or more** websites, designs, variations, options, versions, concepts, or mockups in a single request ("make me 3 sites", "give me 5 designs", "a few different versions", "some options for my restaurant"). **Exception:** Tier C's C3 "draft mockups" are Higgsfield concept *stills* inside one chosen vibe, not site builds — choosing 3 or 5 of them never triggers this mandate (see the Tier C section).
 
 When triggered you are **not** generating one site with variants — you run the **full pipeline (Steps 1–7) independently, once per site**, under one hard rule:
 
@@ -574,7 +574,7 @@ More motion is not more better. Magic UI's own guidance and `emil-design-eng` en
 - **Start with 1 primary effect + 1 supporting effect per viewport** — one hero anchor (e.g. `globe`) plus one ambient layer (e.g. `particles`), not three stacked effects.
 - **Never stack multiple expensive animated backgrounds** in one viewport — it wrecks performance and contrast.
 - **Animated backgrounds must not reduce text contrast** — verify against the locked palette from the Quality Trio.
-- **Generated scroll video (Higgsfield Layer 3) is one set-piece, not a default** — it costs real credits and ships a heavy asset; use at most one per site, Tier 4-5, after `higgsfield_check_cost`. Don't pair it with a competing registry hero in the same viewport.
+- **Generated scroll video (Higgsfield Layer 3) is one set-piece, not a default** — it costs real credits and ships a heavy asset; use at most one per site, Tier 4-5, after `higgsfield_check_cost`. Don't pair it with a competing registry hero in the same viewport. **(Tier C is the one sanctioned exception:** its hero + chapter loops are a single authorized film governed by `references/cinematic-tier.md`'s own restraint rules — max two videos decoding at once, no additional animated backgrounds on top.)
 - The Step 6 polish pass runs `emil-design-eng` (Tier 3+) specifically to catch over-animation, janky timing, and motion that fights the content. If it flags excess, **cut motion — don't add more.**
 
 ## 3D scroll animation — scroll-scrubbed hero (Higgs Field → flip-book canvas)
@@ -599,6 +599,7 @@ The default is decided in **Step 2** from tier + niche and stated in the transpa
 - **Default ON even at Tier 4 for visually-driven niches** — restaurant/food, hospitality/hotels, real estate, automotive, fashion/beauty, fitness/wellness, events/weddings, creative agency, product launch, portfolio, travel.
 - **Default OFF** — Tier 1–3 and text/utility niches: dashboards, SaaS consoles, law/medical/finance intake, B2B docs, nonprofits/info sites, anything where speed and clarity beat spectacle.
 - **User overrides win:** "go wild" / "maximum" / "most interactive" / "make it cinematic" → force ON (and treat as Tier-5 motion). "tone it down" / "keep it simple" / "make it fast" → force OFF (standard hero).
+- **Escalation path:** "make it cinematic" upgrades the *hero*; a request for a whole "cinematic experience / story site / film website" is a different, bigger thing — that's **Tier C** (see "Tier C — Cinematic Story Experience" below), which is opt-in only and never entered from this toggle alone. When a visually-driven brief seems to want it, *offer* Tier C in the transparency line; never assume the credit spend.
 
 ### Pipeline (when `higgs_hero` is ON or the mode is triggered)
 
@@ -640,6 +641,63 @@ Pick `fps` so `duration × fps` lands in 120–200; `-frames:v 200` is a hard ce
 
 ### Restraint
 One scroll-scrub hero per site; never stack it with other heavy animated backgrounds in the same viewport (decode + contrast cost). Keep the source clip short and the motion simple. If `emil-design-eng` (Step 6) flags jank or over-motion, shorten the clip or drop the frame count — don't pile on more.
+
+## Tier C — Cinematic Story Experience (opt-in, above Tier 5 in spend)
+
+The premium ceiling of this skill: given the details of a business, **direct a stylized
+cinematic film for it on Higgsfield and build the site around that film** — the movie is the
+background, scroll advances the story, and each facet of a multifaceted business becomes a
+chapter with its own scene. UI components sampled from this skill's own library (Step 3 rules)
+overlay each chapter and arrive as the background moves. **Full playbook — story intake, vibe
+templates, mockups, prompts, chapter-loop implementation:
+`references/cinematic-tier.md`. Read it whenever this tier triggers.**
+
+**Triggers (explicit only):** "cinematic experience", "cinematic website", "story site", "film
+website", "Tier C", or a yes to an explicit Tier C offer. It is **never** entered from the
+Step 2.5 blueprint roll, the tier-niche map, a multi-site tier randomization, or Demo Mode /
+batch runs — video credits are only ever spent on a business the user chose by name.
+**Collisions resolve deterministically:** Demo Mode / batch context always wins — decline
+Tier C in one line and offer it as a separate named-business run ("demo mode, make me a
+cinematic website" stays Demo Mode; an explicit scroll-hero override there uses the standard
+`higgs_hero` pipeline, never Tier C). "Make it cinematic" alone is the `higgs_hero` upgrade,
+not Tier C.
+
+**Numeric machinery:** wherever the pipeline needs a numeric tier (Step 3 sampling band,
+`ui-ux-pro-max --tier`, registry gating, the design ticket), **Tier C behaves as Tier 5** —
+the design ticket prints `Tier C (numeric proxy: 5)`. **Step 2.5 is skipped entirely**: the
+film IS the experience blueprint (a story-directed B10 hero + chapter loops) — never roll or
+add another heavy blueprint alongside it.
+
+**Two site types** (the C3 mockup questions route between them):
+
+- **Hero-cinematic (C-lite)** — only the hero gets the film (a story-directed scroll-scrub
+  hero); the rest is a standard Tier 4–5 build. Cheapest path; technically the `higgs_hero`
+  pipeline with C1–C2 story direction applied — **but its stills and video are still priced
+  and confirmed through the C3/C4 gates** (the older Tier 4–5 opt-in cost-check alone is not
+  sufficient once inside Tier C).
+- **Full cinematic experience** — a scroll-scrubbed hero master shot **plus one looping scene
+  per business facet**, crossfaded as the visitor scrolls between chapters (the
+  harbor-dev-v3 / stewardengine / headlandmarketing pattern).
+
+**The pipeline (C-steps replace/extend the numbered steps as noted):**
+
+| C-step | What happens | Interacts with |
+|---|---|---|
+| **C1 Story intake** | Discovery questions + map business facets → chapters → camera beats ("what the camera sees / what it argues") | **replaces Step 1** (one consolidated question round — the two Step 1 questions fold into it) |
+| **C2 Vibe selection** | Draft **2–3 named vibe directions**, each with story logic, a palette-anchor hex set, and its actual master-prompt opening line → **AskUserQuestion, user picks** | feeds Step 3.5 token-lock |
+| **C3 Mockups** | Ask **"how many draft mockups — 1, 3, or 5?"**, then **"one shared UI-component image set, a fresh set per mockup, or hero-only?"** — each option shown **with its estimated Higgsfield total** (`higgsfield_check_cost`). **The option selection IS the still-spend authorization** — generate exactly the chosen option's stills, nothing more; user picks the visual contract. "Hero-only" = the C-lite path | extends Step 5; stills before any video |
+| **C4 Clip plan + gate** | Chapters → clips (hero segments + one loop per facet + strategy-derived keyframes + **any planned upscale**), price **everything** via `higgsfield_check_cost`, print the estimate table (credits only), **wait for explicit "generate"**. Unskippable — "just build it" never waives this gate | gates all video spend |
+| **C5 Generate** | Master continuous shot (timeline-of-beats prompt, brand hexes embedded verbatim; **segment chaining** past the model's per-gen cap: extract last frame → "Continue this exact scene: …"); seamless chapter loops from each chapter's keyframe | `references/higgsfield.md` routing table |
+| **C6 Build** | Hero = existing flip-book scrub (B10 pipeline, unchanged). Chapters = fixed full-viewport muted loops **crossfaded by scroll position** (GSAP ScrollTrigger scrub / Framer `useScroll` + Lenis). Overlays = **randomly sampled library components** (Step 3 sampling at the Tier 4–5 band, variety rule intact), ≥1 interactive component per chapter, entrances tied to the chapter's scroll range. **Scroll feels choppy → study harbor-dev-v3.vercel.app first** — it is the known-good live reference for scroll↔video binding | Steps 3, 4; `scroll-animation-best-practices.md` |
+| **C7 Quality + ship** | Quality Trio, full polish pass (`emil-design-eng` mandatory — motion IS the product), Step 7 deploy. Run report adds `Vibe:` and `Film:` lines (clips generated · credits actually spent) | Steps 3.5, 6, 7 |
+
+**Restraint under Tier C:** the film (hero scrub + chapter loops = one continuous world) IS the
+site's single heavy set-piece — never add particle/shader/animated backgrounds on top; **max two
+chapter videos decoding at once** (crossfades only — pause the rest); overlays stay
+glassmorphic/scrimmed and content-serving, contrast-checked against each loop's brightest
+frame. `prefers-reduced-motion` → static keyframe posters throughout (and overlay motion
+degrades to opacity-only); a failed loop ships its keyframe still (never-hard-fail, same
+contract as the Step 5 chain).
 
 ## Design quality — call companion skills
 
