@@ -3,3 +3,27 @@
 node_modules/
 dist/
 generated-site-*/
+
+# Local state excluded from shared AI handoffs
+.env
+.env.local
+.env.production
+.env.*.local
+*.env
+*.pem
+*.p12
+*.pfx
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.tsbuildinfo
+.cache/
+.claude/settings.local.json
+.claude/launch.json
+.claude/worktrees/
+.ai/context/
+.playwright-mcp/
+*.gguf
+*.safetensors
